@@ -1,0 +1,40 @@
+{
+  "name": "tennis-academy-management",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tennis academy booking and management platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run start:dev -w @tennis/api",
+    "build": "npm run build -w @tennis/api",
+    "lint": "npm run lint -w @tennis/api",
+    "typecheck": "npm run typecheck -w @tennis/api",
+    "test": "npm run test -w @tennis/api",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:migrate": "npm run prisma:migrate -w @tennis/api",
+    "db:deploy": "npm run prisma:deploy -w @tennis/api",
+    "db:seed": "npm run prisma:seed -w @tennis/api",
+    "db:studio": "npm run prisma:studio -w @tennis/api"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
+    "prisma": "^6.19.3",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=20.18.0",
+    "npm": ">=10.8.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3"
+  }
+}

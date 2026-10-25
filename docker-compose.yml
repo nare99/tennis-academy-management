@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tennis-academy-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tennis
+      POSTGRES_PASSWORD: tennis_dev_password
+      POSTGRES_DB: tennis_academy
+    ports:
+      - "5432:5432"
+    volumes:
+      - tennis_academy_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tennis -d tennis_academy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  tennis_academy_data:
