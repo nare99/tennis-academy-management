@@ -26,6 +26,21 @@ async function main(): Promise<void> {
   });
 
   console.log('Seed completed: demo admin and two courts are available.');
+
+  await prisma.academySettings.upsert({
+    where: { id: 'academy' },
+    update: {
+      timeZone: 'Asia/Yerevan',
+      peakStartMinute: 17 * 60,
+      peakEndMinute: 21 * 60,
+    },
+    create: {
+      id: 'academy',
+      timeZone: 'Asia/Yerevan',
+      peakStartMinute: 17 * 60,
+      peakEndMinute: 21 * 60,
+    },
+  });
 }
 
 main()
