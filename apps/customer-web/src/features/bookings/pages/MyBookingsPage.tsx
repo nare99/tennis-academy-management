@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import {
-  cancelBooking,
+  cancelBooking as cancelBookingRequest,
   getMyBookings,
 } from '../bookings.api';
 
@@ -39,7 +39,7 @@ export function MyBookingsPage() {
     void loadBookings();
   }, []);
 
-  async function cancelBooking(id: string) {
+  async function handleCancelBooking(id: string) {
     const confirmed = window.confirm(
       'Are you sure you want to cancel this booking?',
     );
@@ -51,7 +51,7 @@ export function MyBookingsPage() {
     setNotice('');
 
     try {
-      await cancelBooking(id);
+      await cancelBookingRequest(id);
 
       setNotice('Your booking has been cancelled.');
       await loadBookings();
@@ -138,7 +138,7 @@ export function MyBookingsPage() {
                     <button
                       type="button"
                       disabled={cancelingId === booking.id}
-                      onClick={() => void cancelBooking(booking.id)}
+                      onClick={() => void handleCancelBooking(booking.id)}
                       className="text-xs font-semibold text-red-700 hover:underline disabled:opacity-50"
                     >
                       {cancelingId === booking.id ? 'Cancelling…' : 'Cancel'}
