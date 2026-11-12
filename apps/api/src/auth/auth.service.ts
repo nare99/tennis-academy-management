@@ -130,6 +130,9 @@ export class AuthService {
     }
 
     if (!session.user.isActive) {
+      await this.prisma.authSession.deleteMany({
+        where: { id: session.id },
+      });
       return null;
     }
 
