@@ -187,6 +187,9 @@ describe('AuthService', () => {
       const result = await service.validateSession('valid-format-token');
 
       expect(result).toBeNull();
+      expect(prisma.authSession.deleteMany).toHaveBeenCalledWith({
+        where: { id: 'session-2' },
+      });
     });
   });
 });

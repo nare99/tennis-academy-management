@@ -1,42 +1,18 @@
-
-import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { getCurrentUser, logout } from '../../features/auth/auth.api';
-import type { PublicUser } from '../../features/auth/auth.types';
+import { useAuth } from '../../features/auth/AuthContext';
 import { Brand } from './Brand';
 
 export function Header() {
-  const [user, setUser] = useState<PublicUser | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const { user, status, logout } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    let cancelled = false;
-
-    getCurrentUser()
-      .then((result) => {
-        if (!cancelled) setUser(result.user);
-      })
-      .catch(() => {
-        if (!cancelled) setUser(null);
-      })
-      .finally(() => {
-        if (!cancelled) setLoaded(true);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   async function handleLogout() {
     try {
       await logout();
-      setUser(null);
       navigate('/', { replace: true });
     } catch {
-      // Keep the current session UI if logout failed.
+      // Keep the signed-in state when the server could not end the session.
     }
   }
 
@@ -54,7 +30,11 @@ export function Header() {
       </nav>
 
       <div className="flex items-center gap-4">
-        {loaded && user ? (
+        {status === 'loading' ? (
+          <span className="text-sm text-stone-400" aria-live="polite">
+            Checking session…
+          </span>
+        ) : user ? (
           <>
             <Link
               className="text-sm font-semibold text-stone-700 hover:text-academy-green"

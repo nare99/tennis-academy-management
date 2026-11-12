@@ -1,12 +1,19 @@
+import { useState, type FormEvent } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-
-import { login, register } from '../auth.api';
 import { Brand } from '../../../components/layout/Brand';
-import { useNavigate, Link } from 'react-router-dom';
-import { FormEvent, useState } from 'react';
+import { useAuth } from '../AuthContext';
+import { login, register } from '../auth.api';
+
+type AuthLocationState = {
+  from?: string;
+  bookingIntent?: { date: string; startAt: string; endAt: string };
+};
 
 export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { setAuthenticatedUser } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,18 +28,26 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
     setSuccess('');
 
     try {
-      const payload =
-        mode === 'register'
-          ? { name: name.trim(), email: email.trim(), password }
-          : { email: email.trim(), password };
-
       const result =
         mode === 'register'
           ? await register({ name: name.trim(), email: email.trim(), password })
           : await login({ email: email.trim(), password });
 
+      setAuthenticatedUser(result.user);
       setSuccess(`Welcome${result.user.name ? `, ${result.user.name}` : ''}!`);
-      window.setTimeout(() => navigate('/'), 500);
+
+      const state = location.state as AuthLocationState | null;
+      const destination = state?.from ?? '/';
+      window.setTimeout(
+        () =>
+          navigate(destination, {
+            replace: true,
+            state: state?.bookingIntent
+              ? { bookingIntent: state.bookingIntent }
+              : null,
+          }),
+        300,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
@@ -139,6 +154,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
             <Link
               className="font-bold text-academy-green"
               to={mode === 'login' ? '/register' : '/login'}
+              state={location.state}
             >
               {mode === 'login' ? 'Create an account' : 'Log in'}
             </Link>

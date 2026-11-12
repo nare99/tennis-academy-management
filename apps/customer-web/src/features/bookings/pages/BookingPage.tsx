@@ -1,5 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+
+import { useAuth } from '../../auth/AuthContext';
 
 import { createBooking, getAvailability } from '../bookings.api';
 import type {
@@ -21,8 +23,14 @@ import {
 export function BookingPage() {
   const { courtId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, status: authStatus } = useAuth();
+  const bookingIntent = (location.state as {
+    bookingIntent?: { date: string; startAt: string; endAt: string };
+  } | null)?.bookingIntent;
+  const restoredBookingIntent = useRef(false);
 
-  const [date, setDate] = useState(academyDate);
+  const [date, setDate] = useState(bookingIntent?.date ?? academyDate);
   const [availability, setAvailability] = useState<AvailabilityResponse | null>(null);
   const [selectedStart, setSelectedStart] = useState('');
   const [selectedOption, setSelectedOption] = useState<BookingOption | null>(null);
@@ -60,6 +68,27 @@ export function BookingPage() {
     };
   }, [courtId, date]);
 
+  useEffect(() => {
+    if (!availability || !bookingIntent || restoredBookingIntent.current) return;
+
+    const slot = availability.slots.find(
+      (availableSlot) => availableSlot.startAt === bookingIntent.startAt,
+    );
+    const option = slot?.options.find(
+      (availableOption) => availableOption.endAt === bookingIntent.endAt,
+    );
+
+    if (slot && option) {
+      setSelectedStart(slot.startAt);
+      setSelectedOption(option);
+      setMessage('Your selected time has been restored. Please confirm availability again.');
+    } else {
+      setMessage('Your previous time is no longer available. Please choose another time.');
+    }
+
+    restoredBookingIntent.current = true;
+  }, [availability, bookingIntent]);
+
   function selectStart(slot: AvailableSlot) {
     setSelectedStart(slot.startAt);
     setSelectedOption(null);
@@ -75,12 +104,31 @@ export function BookingPage() {
 
     if (!courtId || !selectedStart || !selectedOption) return;
 
+    if (authStatus === 'loading') {
+      setError('Please wait while we check your sign-in status.');
+      return;
+    }
+
+    if (!user) {
+      navigate('/login', {
+        state: {
+          from: location.pathname,
+          bookingIntent: {
+            date,
+            startAt: selectedStart,
+            endAt: selectedOption.endAt,
+          },
+        },
+      });
+      return;
+    }
+
     setSubmitting(true);
     setError('');
     setMessage('');
 
     try {
-      await createBooking({ courtId, startAt: selectedStart, endAt: selectedOption.endAt })
+      await createBooking({ courtId, startAt: selectedStart, endAt: selectedOption.endAt });
 
       navigate('/my-bookings', {
         state: { bookingCreated: true },
@@ -101,6 +149,10 @@ export function BookingPage() {
       <Link to="/#courts" className="text-xs text-academy-muted hover:text-academy-green">
         ← Back to courts
       </Link>
+
+      {message && (
+        <p role="status" className="mt-5 text-sm text-academy-muted">{message}</p>
+      )}
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_340px]">
         <section>
