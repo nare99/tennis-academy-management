@@ -74,7 +74,7 @@ The stabilization work is on branch `stabilize/customer-auth-bookings`. The bran
 - [x] API production build passes locally (user-confirmed after back-merge).
 - [x] Customer-web typecheck passes locally (user-confirmed).
 - [x] Customer-web production build passes locally (user-confirmed).
-- [x] Update README to reflect the implemented customer frontend, authentication, and court-booking functionality; remove stale statements that say these are not implemented.
+- [ ] Update README to reflect the implemented customer frontend, authentication, and court-booking functionality; remove stale statements that say these are not implemented.
 - [x] Record actual verification results and remaining limitations here.
 
 ## Exit criteria
