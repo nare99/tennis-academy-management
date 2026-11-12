@@ -25,7 +25,8 @@ Changes have been started on branch `stabilize/customer-auth-bookings`. They are
 - [ ] Compare the default-branch files with the user's local working tree before applying code changes; preserve unpushed local work.
 - [x] Run API lint locally after correcting the Prisma glob and removing an unused import; user confirmed the command exits successfully.
 - [x] Run API TypeScript typecheck locally; user confirmed `tsc --noEmit -p tsconfig.build.json` exits successfully.
-- [ ] Run API unit tests and build; not yet verified.
+- [x] Run API unit tests locally; user confirmed 6 suites and 30 tests passed.
+- [ ] Run API production build locally; command was started, but successful completion is not yet confirmed.
 
 ## Phase 1 — Correct customer authentication state
 
@@ -68,7 +69,8 @@ Changes have been started on branch `stabilize/customer-auth-bookings`. They are
 - [ ] Add appropriate frontend tests for auth state, route protection, booking redirect/return, and cancellation.
 - [x] API lint passes locally (confirmed by user).
 - [x] API typecheck passes locally (confirmed by user).
-- [ ] Run API unit tests and build.
+- [x] API unit tests pass locally: 6 suites, 30 tests (user-confirmed).
+- [ ] API production build passes locally (awaiting confirmation).
 - [ ] Run customer-web typecheck and production build.
 - [ ] Update README to reflect implemented customer frontend, authentication, and court-booking functionality; remove stale statements that say these are not implemented.
 - [ ] Record actual verification results and any remaining limitations here.
