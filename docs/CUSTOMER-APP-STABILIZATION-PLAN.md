@@ -10,6 +10,15 @@ This is the working checklist for stabilizing the existing customer application 
 - A checkbox means the change is implemented and verified, not merely drafted or committed.
 - After each implementation step, run the relevant checks and record the actual result.
 
+## Current implementation notes
+
+Changes have been started on branch `stabilize/customer-auth-bookings`. They are committed to the branch but have not yet been run locally or verified. Therefore, implementation checkboxes below remain unchecked until local checks and behavior tests succeed.
+
+- Shared auth context/provider, header integration, login/register state update, protected booking-history route, and booking-intent restoration have been implemented on the branch.
+- Inactive-account session validation now deletes the matching session; the existing unit test asserts this behavior.
+- The cancellation recursion remains unresolved on the remote branch because the user's local fix has not yet been compared with the repository copy. Sync/inspect the local change before touching this file.
+- No API/frontend test or build result is claimed from these remote edits.
+
 ## Phase 0 — Baseline review
 
 - [x] Inspect the customer frontend structure, current authentication flow, booking flow, API session implementation, test setup, workspace scripts, and CI configuration on the repository default branch.
