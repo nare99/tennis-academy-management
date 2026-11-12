@@ -16,8 +16,8 @@ The stabilization work is on branch `stabilize/customer-auth-bookings`. The bran
 
 - Shared auth context/provider, header integration, login/register state update, protected booking-history route, and booking-intent restoration are implemented.
 - Inactive-account session validation deletes the matching session; the existing auth service test covers this behavior.
-- `MyBookingsPage.tsx` now imports the API operation as `cancelBookingRequest` and calls it from `handleCancelBooking`, then reloads the booking list. The code-level recursion/shadowing bug is fixed. Manual cancellation verification and a dedicated regression test are still outstanding.
-- User-confirmed local checks after the back-merge: API lint, typecheck, 6 test suites/30 tests, API build, customer-web typecheck, and customer-web production build all completed successfully.
+- `MyBookingsPage.tsx` imports the API operation as `cancelBookingRequest` and calls it from `handleCancelBooking`, then reloads the booking list. The code-level recursion/shadowing bug is fixed. The cancellation regression test passes, and the user manually verified cancellation eligibility for future active bookings.
+- User-confirmed local checks after the back-merge: API lint, typecheck, 6 test suites/30 tests, API build, customer-web test (1 test), typecheck, and customer-web production build all completed successfully. GitHub Actions API and customer-web jobs also passed on commit `97c8e44`.
 - User previously confirmed the six manual authentication and booking-flow scenarios listed in Phases 1–2.
 
 ## Phase 0 — Baseline review
@@ -53,8 +53,8 @@ The stabilization work is on branch `stabilize/customer-auth-bookings`. The bran
 
 - [x] Compare the user's cancellation change with the default branch; the fix was committed to `main` and back-merged into this branch.
 - [x] Ensure the UI handler calls the API function using distinct names (`handleCancelBooking` and `cancelBookingRequest`); verified in the branch source.
-- [ ] Add or update a regression test so cancellation invokes the API exactly once and refreshes the booking list.
-- [ ] Verify cancellation works for an eligible future active booking and that cancelled/past bookings cannot be cancelled through the UI; backend rules remain authoritative.
+- [x] Add a regression test verifying cancellation invokes the API exactly once and refreshes the booking list; the customer-web test passed locally and in CI.
+- [x] Manually verify cancellation works for an eligible future active booking and cancelled/past bookings cannot be cancelled through the UI; backend rules remain authoritative (user-confirmed).
 
 ## Phase 4 — Session lifecycle hardening
 
@@ -66,15 +66,15 @@ The stabilization work is on branch `stabilize/customer-auth-bookings`. The bran
 
 ## Phase 5 — Quality gates and project documentation
 
-- [ ] Add customer-web typecheck and build steps to CI using scripts that actually exist in the workspace.
-- [ ] Add appropriate frontend tests for auth state, route protection, booking redirect/return, and cancellation.
+- [x] Add customer-web test, typecheck, and build steps to CI using existing workspace scripts; both API and customer-web CI jobs passed on commit `97c8e44`.
+- [ ] Add further frontend tests for auth state, route protection, and booking redirect/return. Cancellation currently has one passing regression test.
 - [x] API lint passes locally (confirmed by user).
 - [x] API typecheck passes locally (confirmed by user).
 - [x] API unit tests pass locally: 6 suites, 30 tests (user-confirmed after back-merge).
 - [x] API production build passes locally (user-confirmed after back-merge).
 - [x] Customer-web typecheck passes locally (user-confirmed).
 - [x] Customer-web production build passes locally (user-confirmed).
-- [ ] Update README to reflect implemented customer frontend, authentication, and court-booking functionality; remove stale statements that say these are not implemented.
+- [x] Update README to reflect the implemented customer frontend, authentication, and court-booking functionality; remove stale statements that say these are not implemented.
 - [x] Record actual verification results and remaining limitations here.
 
 ## Exit criteria
