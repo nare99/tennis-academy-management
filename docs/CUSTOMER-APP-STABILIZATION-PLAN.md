@@ -12,28 +12,29 @@ This is the working checklist for stabilizing the existing customer application 
 
 ## Current implementation notes
 
-Changes have been started on branch `stabilize/customer-auth-bookings`. They are committed to the branch but have not yet been run locally or verified. Therefore, implementation checkboxes below remain unchecked until local checks and behavior tests succeed.
+The stabilization work is on branch `stabilize/customer-auth-bookings`. The branch includes the cancellation fix back-merged from `main`.
 
-- Shared auth context/provider, header integration, login/register state update, protected booking-history route, and booking-intent restoration have been implemented on the branch.
-- Inactive-account session validation now deletes the matching session; the existing unit test asserts this behavior.
-- The cancellation recursion remains unresolved on the remote branch because the user's local fix has not yet been compared with the repository copy. Sync/inspect the local change before touching this file.
-- No API/frontend test or build result is claimed from these remote edits.
+- Shared auth context/provider, header integration, login/register state update, protected booking-history route, and booking-intent restoration are implemented.
+- Inactive-account session validation deletes the matching session; the existing auth service test covers this behavior.
+- `MyBookingsPage.tsx` now imports the API operation as `cancelBookingRequest` and calls it from `handleCancelBooking`, then reloads the booking list. The code-level recursion/shadowing bug is fixed. Manual cancellation verification and a dedicated regression test are still outstanding.
+- User-confirmed local checks after the back-merge: API lint, typecheck, 6 test suites/30 tests, API build, customer-web typecheck, and customer-web production build all completed successfully.
+- User previously confirmed the six manual authentication and booking-flow scenarios listed in Phases 1–2.
 
 ## Phase 0 — Baseline review
 
 - [x] Inspect the customer frontend structure, current authentication flow, booking flow, API session implementation, test setup, workspace scripts, and CI configuration on the repository default branch.
-- [ ] Compare the default-branch files with the user's local working tree before applying code changes; preserve unpushed local work.
+- [x] Compare the default-branch files with the user's local working tree before applying code changes; preserve unpushed local work. The cancellation fix was committed to `main` and back-merged into this branch.
 - [x] Run API lint locally after correcting the Prisma glob and removing an unused import; user confirmed the command exits successfully.
 - [x] Run API TypeScript typecheck locally; user confirmed `tsc --noEmit -p tsconfig.build.json` exits successfully.
-- [x] Run API unit tests locally; user confirmed 6 suites and 30 tests passed.
-- [x] Run API production build locally; user confirmed it completed successfully.
+- [x] Run API unit tests locally after the back-merge; user confirmed 6 suites and 30 tests passed.
+- [x] Run API production build locally after the back-merge; user confirmed it completed successfully.
 
 ## Phase 1 — Correct customer authentication state
 
-- [ ] Add a shared React authentication provider/context initialized from `GET /api/auth/me`.
-- [ ] Expose a clear auth state: loading, authenticated user, and unauthenticated.
-- [ ] Update login and registration to update the shared auth state immediately after the API succeeds (registration currently creates a session automatically).
-- [ ] Update the header to consume shared auth state instead of maintaining its own one-time user fetch.
+- [x] Add a shared React authentication provider/context initialized from `GET /api/auth/me`.
+- [x] Expose a clear auth state: loading, authenticated user, and unauthenticated.
+- [x] Update login and registration to update the shared auth state immediately after the API succeeds (registration currently creates a session automatically).
+- [x] Update the header to consume shared auth state instead of maintaining its own one-time user fetch.
 - [ ] Update logout to clear shared auth state only after the logout API succeeds; handle errors visibly.
 - [x] Ensure the auth provider is mounted once above the application routes.
 - [x] Manually verify registration updates the header without reload, session persistence after refresh, and logout updates the header immediately.
@@ -50,14 +51,14 @@ Changes have been started on branch `stabilize/customer-auth-bookings`. They are
 
 ## Phase 3 — Fix and regression-test cancellation
 
-- [ ] Compare the user's local cancellation change with the default branch. The currently inspected default-branch `MyBookingsPage.tsx` still has a local `cancelBooking` handler shadowing the imported API function and calling itself; do not overwrite a correct local fix.
-- [ ] Ensure the UI handler calls the API function (use distinct names such as `handleCancelBooking` and `cancelBookingRequest`).
+- [x] Compare the user's cancellation change with the default branch; the fix was committed to `main` and back-merged into this branch.
+- [x] Ensure the UI handler calls the API function using distinct names (`handleCancelBooking` and `cancelBookingRequest`); verified in the branch source.
 - [ ] Add or update a regression test so cancellation invokes the API exactly once and refreshes the booking list.
 - [ ] Verify cancellation works for an eligible future active booking and that cancelled/past bookings cannot be cancelled through the UI; backend rules remain authoritative.
 
 ## Phase 4 — Session lifecycle hardening
 
-- [ ] Revoke a session when validation discovers its account is inactive, rather than merely returning unauthenticated while leaving the session stored.
+- [x] Revoke a session when validation discovers its account is inactive, rather than merely returning unauthenticated while leaving the session stored.
 - [ ] Add tests for successful login/session creation, valid session validation, unknown/invalid token, logout invalidation, expired-session deletion, and inactive-account session revocation.
 - [ ] Review session cookie settings and document the intended local/production behavior.
 - [ ] Define and implement an appropriate CSRF/origin protection strategy for cookie-authenticated state-changing endpoints before production deployment.
@@ -69,11 +70,12 @@ Changes have been started on branch `stabilize/customer-auth-bookings`. They are
 - [ ] Add appropriate frontend tests for auth state, route protection, booking redirect/return, and cancellation.
 - [x] API lint passes locally (confirmed by user).
 - [x] API typecheck passes locally (confirmed by user).
-- [x] API unit tests pass locally: 6 suites, 30 tests (user-confirmed).
-- [x] API production build passes locally (user-confirmed).
-- [ ] Run customer-web typecheck and production build.
+- [x] API unit tests pass locally: 6 suites, 30 tests (user-confirmed after back-merge).
+- [x] API production build passes locally (user-confirmed after back-merge).
+- [x] Customer-web typecheck passes locally (user-confirmed).
+- [x] Customer-web production build passes locally (user-confirmed).
 - [ ] Update README to reflect implemented customer frontend, authentication, and court-booking functionality; remove stale statements that say these are not implemented.
-- [ ] Record actual verification results and any remaining limitations here.
+- [x] Record actual verification results and remaining limitations here.
 
 ## Exit criteria
 
