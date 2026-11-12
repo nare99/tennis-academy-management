@@ -1,4 +1,3 @@
-
 import { Route, Routes } from 'react-router-dom';
 
 import { Header } from '../components/layout/Header';
@@ -6,6 +5,7 @@ import { NotFoundPage } from '../components/layout/NotFoundPage';
 
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { RegisterPage } from '../features/auth/pages/RegisterPage';
+import { ProtectedRoute } from '../features/auth/ProtectedRoute';
 
 import { HomePage } from '../features/courts/pages/HomePage';
 
@@ -55,15 +55,17 @@ export function AppRouter() {
         }
       />
 
-      <Route
-        path="/my-bookings"
-        element={
-          <>
-            <Header />
-            <MyBookingsPage />
-          </>
-        }
-      />
+      <Route element={<ProtectedRoute />}>
+        <Route
+          path="/my-bookings"
+          element={
+            <>
+              <Header />
+              <MyBookingsPage />
+            </>
+          }
+        />
+      </Route>
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
