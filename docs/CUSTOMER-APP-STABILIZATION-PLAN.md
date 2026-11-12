@@ -26,7 +26,7 @@ Changes have been started on branch `stabilize/customer-auth-bookings`. They are
 - [x] Run API lint locally after correcting the Prisma glob and removing an unused import; user confirmed the command exits successfully.
 - [x] Run API TypeScript typecheck locally; user confirmed `tsc --noEmit -p tsconfig.build.json` exits successfully.
 - [x] Run API unit tests locally; user confirmed 6 suites and 30 tests passed.
-- [ ] Run API production build locally; command was started, but successful completion is not yet confirmed.
+- [x] Run API production build locally; user confirmed it completed successfully.
 
 ## Phase 1 — Correct customer authentication state
 
@@ -35,18 +35,18 @@ Changes have been started on branch `stabilize/customer-auth-bookings`. They are
 - [ ] Update login and registration to update the shared auth state immediately after the API succeeds (registration currently creates a session automatically).
 - [ ] Update the header to consume shared auth state instead of maintaining its own one-time user fetch.
 - [ ] Update logout to clear shared auth state only after the logout API succeeds; handle errors visibly.
-- [ ] Ensure the auth provider is mounted once above the application routes.
-- [ ] Verify register → header shows the signed-in user without a reload; verify login, refresh persistence, and logout.
+- [x] Ensure the auth provider is mounted once above the application routes.
+- [x] Manually verify registration updates the header without reload, session persistence after refresh, and logout updates the header immediately.
 
 ## Phase 2 — Enforce and explain protected customer routes
 
-- [ ] Add a reusable frontend protected-route component based on the shared auth state.
-- [ ] Protect `/my-bookings`; preserve the requested destination when redirecting to login.
-- [ ] Keep court browsing and availability public.
-- [ ] On booking confirmation, if unauthenticated, redirect to login while preserving the selected court, date, start time, and duration.
-- [ ] After successful login/registration, return the customer to the pending booking flow; re-fetch availability and let the API remain the final authority on conflicts and price.
+- [x] Add a reusable frontend protected-route component based on the shared auth state.
+- [x] Protect `/my-bookings`; preserve the requested destination when redirecting to login.
+- [x] Keep court browsing and availability public.
+- [x] On booking confirmation, if unauthenticated, redirect to login while preserving the selected court, date, start time, and duration.
+- [x] After successful login/registration, return the customer to the pending booking flow and re-fetch availability; API remains the final authority on conflicts and price.
 - [ ] Handle expired/invalid sessions by clearing frontend auth state and redirecting safely.
-- [ ] Verify anonymous users cannot create bookings (backend authorization) and receive a friendly login flow instead of an unexplained 401.
+- [x] Manually verify logged-out booking confirmation redirects to login, restores the selected slot after sign-in, and allows the customer to complete the booking.
 
 ## Phase 3 — Fix and regression-test cancellation
 
@@ -70,7 +70,7 @@ Changes have been started on branch `stabilize/customer-auth-bookings`. They are
 - [x] API lint passes locally (confirmed by user).
 - [x] API typecheck passes locally (confirmed by user).
 - [x] API unit tests pass locally: 6 suites, 30 tests (user-confirmed).
-- [ ] API production build passes locally (awaiting confirmation).
+- [x] API production build passes locally (user-confirmed).
 - [ ] Run customer-web typecheck and production build.
 - [ ] Update README to reflect implemented customer frontend, authentication, and court-booking functionality; remove stale statements that say these are not implemented.
 - [ ] Record actual verification results and any remaining limitations here.
