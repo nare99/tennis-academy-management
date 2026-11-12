@@ -7,6 +7,7 @@ import { login, register } from '../auth.api';
 
 type AuthLocationState = {
   from?: string;
+  bookingIntent?: { date: string; startAt: string; endAt: string };
 };
 
 export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
@@ -37,7 +38,16 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
 
       const state = location.state as AuthLocationState | null;
       const destination = state?.from ?? '/';
-      window.setTimeout(() => navigate(destination, { replace: true }), 300);
+      window.setTimeout(
+        () =>
+          navigate(destination, {
+            replace: true,
+            state: state?.bookingIntent
+              ? { bookingIntent: state.bookingIntent }
+              : null,
+          }),
+        300,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
