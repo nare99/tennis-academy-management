@@ -38,16 +38,13 @@ export default function WeeklyScheduleEditor({
     index: number,
     changes: Partial<OperatingHourInput>,
   ) {
-    const dayIntervals = intervals.filter((item) => item.dayOfWeek === dayOfWeek);
+    const dayIntervals = intervals
+      .filter((item) => item.dayOfWeek === dayOfWeek)
+      .sort((a, b) => a.startMinute - b.startMinute);
     const target = dayIntervals[index];
     if (!target) return;
     const updated = { ...target, ...changes };
-    let seen = 0;
-    onChange(intervals.map((item) => {
-      if (item.dayOfWeek !== dayOfWeek) return item;
-      if (seen++ === index) return updated;
-      return item;
-    }));
+    onChange(intervals.map((item) => item === target ? updated : item));
   }
 
   function addInterval(dayOfWeek: DayOfWeek) {
@@ -59,11 +56,12 @@ export default function WeeklyScheduleEditor({
   }
 
   function removeInterval(dayOfWeek: DayOfWeek, index: number) {
-    let seen = 0;
-    onChange(intervals.filter((item) => {
-      if (item.dayOfWeek !== dayOfWeek) return true;
-      return seen++ !== index;
-    }));
+    const dayIntervals = intervals
+      .filter((item) => item.dayOfWeek === dayOfWeek)
+      .sort((a, b) => a.startMinute - b.startMinute);
+    const target = dayIntervals[index];
+    if (!target) return;
+    onChange(intervals.filter((item) => item !== target));
   }
 
   return (
