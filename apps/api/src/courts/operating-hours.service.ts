@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CourtOperatingHours, Prisma } from '@prisma/client';
+import { CourtOperatingHours } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ReplaceOperatingHoursDto } from './dto/replace-operating-hours.dto';
 
