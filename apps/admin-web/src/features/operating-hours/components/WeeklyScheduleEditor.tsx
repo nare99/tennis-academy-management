@@ -124,7 +124,7 @@ export default function WeeklyScheduleEditor({
               ))}
               <button
                 type="button"
-                disabled={disabled}
+                disabled={disabled || (dayIntervals[dayIntervals.length - 1]?.endMinute ?? 0) >= 1440}
                 onClick={() => addInterval(day)}
                 className="text-xs font-semibold text-academy-green hover:underline disabled:opacity-50"
               >
