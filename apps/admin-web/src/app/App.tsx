@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import RequireAdmin from '../components/auth/RequireAdmin';
 import Login from '../pages/auth/Login';
 import Dashboard from '../pages/dashboard/Dashboard';
+import CourtsPage from '../features/courts/pages/CourtsPage';
 import AdminLayout from '../layouts/AdminLayout';
 import AppProviders from './providers';
 
@@ -19,6 +20,7 @@ export default function App() {
               element={<Navigate to="/dashboard" replace />}
             />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/courts" element={<CourtsPage />} />
           </Route>
         </Route>
 
