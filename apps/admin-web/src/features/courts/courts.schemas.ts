@@ -9,8 +9,7 @@ export const courtSchema = z.object({
   surface: z
     .string()
     .trim()
-    .max(50, 'Surface must be 50 characters or fewer.')
-    .transform((value) => (value.length > 0 ? value : null)),
+    .max(50, 'Surface must be 50 characters or fewer.'),
   isIndoor: z.boolean(),
 });
 
