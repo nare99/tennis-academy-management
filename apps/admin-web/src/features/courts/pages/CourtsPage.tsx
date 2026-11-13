@@ -34,7 +34,7 @@ export default function CourtsPage() {
   async function handleFormSubmit(values: CourtFormValues) {
     const input = {
       name: values.name,
-      surface: values.surface,
+      surface: values.surface || null,
       isIndoor: values.isIndoor,
     };
 
