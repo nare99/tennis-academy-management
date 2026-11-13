@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, feature/admin-web]
   pull_request:
 
 jobs:
@@ -33,3 +33,15 @@ jobs:
       - run: npm run test -w @tennis/customer-web
       - run: npm run typecheck -w @tennis/customer-web
       - run: npm run build -w @tennis/customer-web
+
+  admin-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck -w @tennis/admin-web
+      - run: npm run build -w @tennis/admin-web
