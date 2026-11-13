@@ -5,7 +5,7 @@ import { useAuth } from '../features/auth/AuthContext';
 
 const navigation = [
   { label: 'Dashboard', path: '/dashboard' },
-//   { label: 'Courts', path: '/courts' },
+  { label: 'Courts', path: '/courts' },
 ];
 
 export default function AdminLayout() {
