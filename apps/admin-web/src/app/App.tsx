@@ -4,6 +4,7 @@ import RequireAdmin from '../components/auth/RequireAdmin';
 import Login from '../pages/auth/Login';
 import Dashboard from '../pages/dashboard/Dashboard';
 import CourtsPage from '../features/courts/pages/CourtsPage';
+import OperatingHoursPage from '../features/operating-hours/pages/OperatingHoursPage';
 import AdminLayout from '../layouts/AdminLayout';
 import AppProviders from './providers';
 
@@ -21,6 +22,7 @@ export default function App() {
             />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/courts" element={<CourtsPage />} />
+            <Route path="/operating-hours" element={<OperatingHoursPage />} />
           </Route>
         </Route>
 
