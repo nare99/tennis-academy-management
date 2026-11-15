@@ -14,6 +14,7 @@ describe('TrainersService', () => {
   let prisma: {
     $transaction: jest.Mock;
     trainerInvitation: { findUnique: jest.Mock };
+    user: { findMany: jest.Mock };
   };
   const config = {
     get: jest.fn().mockReturnValue('http://localhost:5174/accept-invitation'),
@@ -23,6 +24,7 @@ describe('TrainersService', () => {
     prisma = {
       $transaction: jest.fn(),
       trainerInvitation: { findUnique: jest.fn() },
+      user: { findMany: jest.fn() },
     };
     service = new TrainersService(
       prisma as unknown as PrismaService,
@@ -112,6 +114,9 @@ describe('TrainersService', () => {
       role: UserRole.TRAINER,
       isActive: false,
       passwordHash: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      trainerProfile: null,
       trainerInvitations: [invitation],
     };
     const tx = {
@@ -146,6 +151,11 @@ describe('TrainersService', () => {
       }),
     );
     expect(result.status).toBe('INVITATION_EXPIRED');
+
+    prisma.user.findMany.mockResolvedValue([user]);
+    const [listedTrainer] = await service.findAll();
+
+    expect(result.status).toBe(listedTrainer.status);
   });
 
   it('returns INACTIVE for a deactivated trainer who has already set a password', async () => {
