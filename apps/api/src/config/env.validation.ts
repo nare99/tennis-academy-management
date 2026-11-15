@@ -8,14 +8,31 @@ const environmentSchema = z
     TRAINER_INVITATION_BASE_URL: z.string().url().optional(),
   })
   .superRefine((environment, context) => {
-    if (
-      environment.NODE_ENV === 'production' &&
-      !environment.TRAINER_INVITATION_BASE_URL
-    ) {
+    const invitationBaseUrl = environment.TRAINER_INVITATION_BASE_URL;
+
+    if (environment.NODE_ENV === 'production' && !invitationBaseUrl) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['TRAINER_INVITATION_BASE_URL'],
         message: 'TRAINER_INVITATION_BASE_URL is required in production.',
+      });
+      return;
+    }
+
+    if (!invitationBaseUrl) return;
+
+    const protocol = new URL(invitationBaseUrl).protocol;
+    if (protocol !== 'http:' && protocol !== 'https:') {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['TRAINER_INVITATION_BASE_URL'],
+        message: 'TRAINER_INVITATION_BASE_URL must use HTTP or HTTPS.',
+      });
+    } else if (environment.NODE_ENV === 'production' && protocol !== 'https:') {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['TRAINER_INVITATION_BASE_URL'],
+        message: 'TRAINER_INVITATION_BASE_URL must use HTTPS in production.',
       });
     }
   });
