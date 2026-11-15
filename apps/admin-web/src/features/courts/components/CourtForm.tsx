@@ -29,6 +29,7 @@ export default function CourtForm({
       name: court?.name ?? '',
       surface: court?.surface ?? '',
       isIndoor: court?.isIndoor ?? false,
+      hasLights: court?.hasLights ?? false,
     },
   });
 
@@ -37,6 +38,7 @@ export default function CourtForm({
       name: court?.name ?? '',
       surface: court?.surface ?? '',
       isIndoor: court?.isIndoor ?? false,
+      hasLights: court?.hasLights ?? false,
     });
   }, [court, reset]);
 
@@ -91,14 +93,24 @@ export default function CourtForm({
         )}
       </div>
 
-      <label className="flex items-center gap-3 text-sm text-academy-ink">
-        <input
-          type="checkbox"
-          {...register('isIndoor')}
-          className="h-4 w-4 rounded border-academy-line accent-academy-green"
-        />
-        Indoor court
-      </label>
+      <div className="space-y-3">
+        <label className="flex items-center gap-3 text-sm text-academy-ink">
+          <input
+            type="checkbox"
+            {...register('isIndoor')}
+            className="h-4 w-4 rounded border-academy-line accent-academy-green"
+          />
+          Indoor court
+        </label>
+        <label className="flex items-center gap-3 text-sm text-academy-ink">
+          <input
+            type="checkbox"
+            {...register('hasLights')}
+            className="h-4 w-4 rounded border-academy-line accent-academy-green"
+          />
+          Court has lights
+        </label>
+      </div>
 
       <div className="flex justify-end gap-3 border-t border-academy-line pt-4">
         <button
