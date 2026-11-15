@@ -208,8 +208,8 @@ The trainer-management branch has been locally verified by the developer:
 - Trainer-invitation database migration applied successfully (all five migrations found; the trainer-invitations migration applied).
 - Prisma Client generated successfully with Prisma 6.19.3.
 - API TypeScript typecheck passed.
-- API Jest tests: 8 suites / 46 tests passed.
-- API production build passed.
+- API Jest tests: 9 suites / 52 tests passed.
+- API ESLint, TypeScript typecheck, and production build passed.
 - Admin frontend TypeScript typecheck and production build passed (Vite 6.4.5).
 - Manual end-to-end trainer invitation workflow passed: an administrator created a trainer and copied the invitation link; the trainer opened it in a private browser window, set a password, and the account became active and visible in the admin interface.
 
