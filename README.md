@@ -81,7 +81,22 @@ Use the dependency versions already declared in the workspace manifests; install
    - Swagger API documentation: http://localhost:3001/docs
    - API health endpoint: http://localhost:3001/health
 
-The Vite development server proxies `/api` requests to `http://localhost:3001`. Keep the API running while using the customer application.
+The Vite development servers proxy `/api` requests to `http://localhost:3001`. Keep the API running while using either frontend.
+
+### Provision a local administrator
+
+Administrator accounts are provisioned explicitly; public registration always creates customers. In PowerShell, set the credentials for this one command (the password is entered without being displayed):
+
+```powershell
+$env:ADMIN_EMAIL = "admin@tennis-academy.local"
+$env:ADMIN_NAME = "Academy Admin"
+$securePassword = Read-Host "Admin password" -AsSecureString
+$env:ADMIN_PASSWORD = [System.Net.NetworkCredential]::new("", $securePassword).Password
+npm run admin:provision -w @tennis/api
+Remove-Item Env:ADMIN_EMAIL, Env:ADMIN_NAME, Env:ADMIN_PASSWORD
+```
+
+Use a unique password of at least 12 characters. The command creates the administrator if the email is new, or explicitly promotes/updates the matching account. It revokes that account's existing sessions so the administrator must sign in again. It does not print or persist the password. The root `.env` file supplies `DATABASE_URL`; admin credentials are supplied only to the provisioning process.
 
 ## Implemented customer functionality
 
@@ -95,7 +110,7 @@ The Vite development server proxies `/api` requests to `http://localhost:3001`. 
 - View the authenticated customer's bookings.
 - Cancel eligible upcoming bookings; the API enforces ownership and cancellation rules.
 
-The API also exposes admin-only court management endpoints. An admin user interface is not yet implemented.
+The API exposes admin-only court management endpoints. The admin frontend currently has its authentication foundation and placeholder dashboard; court-management screens are still planned.
 
 ## Useful commands
 
@@ -130,7 +145,7 @@ infra/                 Deployment-related files
 docs/                  Architecture decisions and implementation plans
 ```
 
-The admin and trainer frontends are not yet implemented. Individual lessons, recurring group training, and payment workflows are also planned rather than completed features.
+The admin frontend scaffold is present, but its management workflows are not yet implemented. The trainer frontend, individual lessons, recurring group training, and payment workflows are also planned rather than completed features.
 
 ## Security and operational notes
 
