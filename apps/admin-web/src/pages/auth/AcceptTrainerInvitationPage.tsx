@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { apiRequest, ApiError } from '../../lib/api-client';
 
@@ -11,7 +11,7 @@ export default function AcceptTrainerInvitationPage() {
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     if (!token) { setError('This invitation link is missing its token.'); return; }

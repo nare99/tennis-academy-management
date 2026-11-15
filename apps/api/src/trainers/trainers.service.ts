@@ -101,14 +101,22 @@ export class TrainersService {
             name: dto.name === undefined ? undefined : dto.name.trim(),
           },
         });
-        const profile = await tx.trainerProfile.update({
-          where: { userId: id },
-          data: {
-            bio: dto.bio === undefined ? undefined : dto.bio?.trim() || null,
-            hourlyRateMinor: dto.hourlyRateMinor,
-            currency: dto.currency,
-          },
-        });
+        const hasProfileChanges =
+          dto.bio !== undefined ||
+          dto.hourlyRateMinor !== undefined ||
+          dto.currency !== undefined;
+        const profile = hasProfileChanges
+          ? await tx.trainerProfile.update({
+              where: { userId: id },
+              data: {
+                bio: dto.bio === undefined ? undefined : dto.bio?.trim() || null,
+                hourlyRateMinor: dto.hourlyRateMinor,
+                currency: dto.currency,
+              },
+            })
+          : await tx.trainerProfile.findUniqueOrThrow({
+              where: { userId: id },
+            });
         return this.toTrainerResponse(
           user, profile, user.isActive ? 'ACTIVE' : 'INACTIVE', null,
         );

@@ -34,7 +34,7 @@ export default function TrainersTable({ trainers, busyId, onEdit, onToggleStatus
             <td className="px-5 py-4 text-academy-muted">
               {trainer.trainerProfile?.hourlyRateMinor == null
                 ? '—'
-                : new Intl.NumberFormat(undefined, { style: 'currency', currency: trainer.trainerProfile.currency }).format(trainer.trainerProfile.hourlyRateMinor / 100)}
+                : new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(trainer.trainerProfile.hourlyRateMinor / 100) + ' ' + trainer.trainerProfile.currency}
             </td>
             <td className="px-5 py-4">
               <span className="rounded-full bg-academy-paper px-2.5 py-1 text-xs font-semibold">{trainer.status}</span>
