@@ -27,8 +27,10 @@ export default function OperatingHoursPage() {
   );
 
   useEffect(() => {
-    if (!selectedCourtId && courtsQuery.data?.length) {
-      setSelectedCourtId(courtsQuery.data[0].id);
+    const firstCourt = courtsQuery.data?.[0];
+
+    if (!selectedCourtId && firstCourt) {
+      setSelectedCourtId(firstCourt.id);
     }
   }, [courtsQuery.data, selectedCourtId]);
 
