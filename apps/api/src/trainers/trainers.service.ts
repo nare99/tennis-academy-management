@@ -187,10 +187,28 @@ export class TrainersService {
 
   async acceptInvitation(dto: AcceptTrainerInvitationDto) {
     const tokenHash = this.hashToken(dto.token);
-    const passwordHash = await argon2.hash(dto.password, { type: argon2.argon2id });
     const now = new Date();
 
+    // Validate the token before spending CPU on an Argon2 password hash.
+    const preview = await this.prisma.trainerInvitation.findUnique({
+      where: { tokenHash },
+      select: {
+        id: true, expiresAt: true, consumedAt: true,
+        user: { select: { role: true, passwordHash: true } },
+      },
+    });
+    if (
+      !preview || preview.consumedAt || preview.expiresAt <= now ||
+      preview.user.role !== UserRole.TRAINER || preview.user.passwordHash
+    ) {
+      throw new UnauthorizedException('This invitation is invalid or has expired.');
+    }
+
+    const passwordHash = await argon2.hash(dto.password, { type: argon2.argon2id });
+
     const user = await this.prisma.$transaction(async (tx) => {
+      // Re-read and atomically claim it because the invitation may have changed
+      // while the password hash was being calculated.
       const invitation = await tx.trainerInvitation.findUnique({
         where: { tokenHash },
         select: {
@@ -199,15 +217,15 @@ export class TrainersService {
         },
       });
       if (
-        !invitation || invitation.consumedAt || invitation.expiresAt <= now ||
+        !invitation || invitation.consumedAt || invitation.expiresAt <= new Date() ||
         invitation.user.role !== UserRole.TRAINER || invitation.user.passwordHash
       ) {
         throw new UnauthorizedException('This invitation is invalid or has expired.');
       }
 
       const claimed = await tx.trainerInvitation.updateMany({
-        where: { id: invitation.id, consumedAt: null, expiresAt: { gt: now } },
-        data: { consumedAt: now },
+        where: { id: invitation.id, consumedAt: null, expiresAt: { gt: new Date() } },
+        data: { consumedAt: new Date() },
       });
       if (claimed.count !== 1) {
         throw new UnauthorizedException('This invitation is invalid or has expired.');
