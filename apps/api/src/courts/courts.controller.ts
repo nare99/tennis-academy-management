@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,11 +21,16 @@ import { CreateCourtDto } from './dto/create-court.dto';
 import { UpdateCourtDto } from './dto/update-court.dto';
 import { UpdateCourtStatusDto } from './dto/update-court-status.dto';
 import { CourtsService } from './courts.service';
+import { OperatingHoursService } from './operating-hours.service';
+import { ReplaceOperatingHoursDto } from './dto/replace-operating-hours.dto';
 
 @ApiTags('Courts')
 @Controller('courts')
 export class CourtsController {
-  constructor(private readonly courtsService: CourtsService) {}
+  constructor(
+    private readonly courtsService: CourtsService,
+    private readonly operatingHoursService: OperatingHoursService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'List active courts' })
@@ -38,6 +44,25 @@ export class CourtsController {
   @ApiOperation({ summary: 'List all courts (admin only)' })
   findAll() {
     return this.courtsService.findAll();
+  }
+
+  @Get(':id/operating-hours')
+  @UseGuards(SessionAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get a court weekly operating schedule (admin only)' })
+  getOperatingHours(@Param('id') id: string) {
+    return this.operatingHoursService.findForCourt(id);
+  }
+
+  @Put(':id/operating-hours')
+  @UseGuards(SessionAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Replace a court weekly operating schedule (admin only)' })
+  replaceOperatingHours(
+    @Param('id') id: string,
+    @Body() dto: ReplaceOperatingHoursDto,
+  ) {
+    return this.operatingHoursService.replaceForCourt(id, dto);
   }
 
   @Post()

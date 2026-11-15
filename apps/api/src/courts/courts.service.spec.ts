@@ -1,4 +1,3 @@
-
 import {
   BadRequestException,
   ConflictException,
@@ -61,6 +60,7 @@ describe('CourtsService', () => {
       name: 'Court 3',
       surface: null,
       isIndoor: false,
+      hasLights: false,
       isActive: true,
     };
 
@@ -75,6 +75,22 @@ describe('CourtsService', () => {
         name: 'Court 3',
         surface: null,
         isIndoor: false,
+        hasLights: false,
+      },
+    });
+  });
+
+  it('persists lighting when creating a court', async () => {
+    prisma.court.create.mockResolvedValue({ id: 'court-2', hasLights: true });
+
+    await service.create({ name: 'Court 2', hasLights: true });
+
+    expect(prisma.court.create).toHaveBeenCalledWith({
+      data: {
+        name: 'Court 2',
+        surface: null,
+        isIndoor: false,
+        hasLights: true,
       },
     });
   });
@@ -93,6 +109,22 @@ describe('CourtsService', () => {
     ).rejects.toThrow(BadRequestException);
 
     expect(prisma.court.update).not.toHaveBeenCalled();
+  });
+
+  it('updates the court lighting setting', async () => {
+    prisma.court.update.mockResolvedValue({ id: 'court-1', hasLights: true });
+
+    await service.update('court-1', { hasLights: true });
+
+    expect(prisma.court.update).toHaveBeenCalledWith({
+      where: { id: 'court-1' },
+      data: {
+        name: undefined,
+        surface: undefined,
+        isIndoor: undefined,
+        hasLights: true,
+      },
+    });
   });
 
   it('returns not found when updating a missing court', async () => {

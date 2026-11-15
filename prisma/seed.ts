@@ -1,18 +1,8 @@
-import { PrismaClient, UserRole } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main(): Promise<void> {
-  await prisma.user.upsert({
-    where: { email: 'admin@tennis-academy.local' },
-    update: { name: 'Academy Admin', role: UserRole.ADMIN, isActive: true },
-    create: {
-      email: 'admin@tennis-academy.local',
-      name: 'Academy Admin',
-      role: UserRole.ADMIN,
-    },
-  });
-
   await prisma.court.upsert({
     where: { name: 'Court 1' },
     update: { surface: 'Hard', isIndoor: false, isActive: true },
@@ -24,8 +14,6 @@ async function main(): Promise<void> {
     update: { surface: 'Clay', isIndoor: true, isActive: true },
     create: { name: 'Court 2', surface: 'Clay', isIndoor: true },
   });
-
-  console.log('Seed completed: demo admin and two courts are available.');
 
   await prisma.academySettings.upsert({
     where: { id: 'academy' },
@@ -41,6 +29,8 @@ async function main(): Promise<void> {
       peakEndMinute: 21 * 60,
     },
   });
+
+  console.log('Seed completed: demo courts and academy settings are available.');
 }
 
 main()
