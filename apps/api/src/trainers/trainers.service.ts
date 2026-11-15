@@ -198,7 +198,7 @@ export class TrainersService {
       },
     });
     if (
-      !preview || preview.consumedAt || preview.expiresAt <= now ||
+      !preview || preview.consumedAt || preview.expiresAt.getTime() <= now.getTime() ||
       preview.user.role !== UserRole.TRAINER || preview.user.passwordHash
     ) {
       throw new UnauthorizedException('This invitation is invalid or has expired.');
@@ -217,7 +217,7 @@ export class TrainersService {
         },
       });
       if (
-        !invitation || invitation.consumedAt || invitation.expiresAt <= new Date() ||
+        !invitation || invitation.consumedAt || invitation.expiresAt.getTime() <= Date.now() ||
         invitation.user.role !== UserRole.TRAINER || invitation.user.passwordHash
       ) {
         throw new UnauthorizedException('This invitation is invalid or has expired.');
