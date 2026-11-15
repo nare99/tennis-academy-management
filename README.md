@@ -2,7 +2,7 @@
 
 A portfolio project for managing a single tennis academy. The current implementation includes a NestJS API and a customer-facing React application for browsing courts, checking availability, creating court bookings, and managing a customer's bookings.
 
-Court booking is the currently implemented customer workflow. Individual lessons, recurring group training, online/offline payments, and the admin/trainer frontends remain planned work unless explicitly listed as implemented below.
+Court booking is the currently implemented customer workflow. The admin frontend has an authentication scaffold, but admin management workflows are not implemented yet. Individual lessons, recurring group training, online/offline payments, and the trainer frontend remain planned work unless explicitly listed as implemented below.
 
 ## Stack
 
@@ -130,7 +130,8 @@ The API exposes admin-only court management endpoints. The admin frontend curren
 | `npm run db:down` | Stop local services |
 | `npm run db:migrate` | Create/apply a development migration |
 | `npm run db:deploy` | Apply committed migrations |
-| `npm run db:seed` | Seed repeatable demo data |
+| `npm run db:seed` | Seed repeatable demo courts and academy settings |
+| `npm run admin:provision -w @tennis/api` | Explicitly create/update an administrator |
 | `npm run db:studio` | Open Prisma Studio |
 
 ## Repository shape
@@ -139,6 +140,7 @@ The API exposes admin-only court management endpoints. The admin frontend curren
 apps/
   api/                 NestJS REST API
   customer-web/        React customer application
+  admin-web/           React admin application (auth scaffold)
 packages/              Shared packages (added when needed)
 prisma/                Database schema, migrations, and seed
 infra/                 Deployment-related files
