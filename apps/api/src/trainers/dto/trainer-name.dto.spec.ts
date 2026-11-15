@@ -37,3 +37,33 @@ describe('trainer name DTO validation', () => {
     expect(dto.name).toBe('Alex Morgan');
   });
 });
+
+describe('UpdateTrainerDto nullable and optional fields', () => {
+  it.each(['email', 'name', 'currency'] as const)(
+    'rejects null for non-nullable %s',
+    (field) => {
+      const dto = plainToInstance(UpdateTrainerDto, { [field]: null });
+
+      expect(validateSync(dto)).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ property: field }),
+        ]),
+      );
+    },
+  );
+
+  it('allows omitted fields in a partial update', () => {
+    const dto = plainToInstance(UpdateTrainerDto, {});
+
+    expect(validateSync(dto)).toHaveLength(0);
+  });
+
+  it('allows null for intentionally nullable profile fields', () => {
+    const dto = plainToInstance(UpdateTrainerDto, {
+      bio: null,
+      hourlyRateMinor: null,
+    });
+
+    expect(validateSync(dto)).toHaveLength(0);
+  });
+});
