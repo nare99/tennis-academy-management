@@ -134,7 +134,7 @@ The migration renames `TrainerProfile.hourlyRate` to `hourlyRateMinor` and adds 
 | Command | Purpose |
 | --- | --- |
 | `npm run dev:api` | Start API in watch mode |
-| `npm run dev -w @tennis/customer-web` | Start customer frontend |
+| `npm run dev -w @tennis/customer-web` | Start customer frontend |\n| `npm run dev -w @tennis/admin-web` | Start admin frontend |
 | `npm run build` | Build the API |
 | `npm run build -w @tennis/customer-web` | Build customer frontend |
 | `npm run lint` | Lint API TypeScript |
@@ -157,7 +157,7 @@ The migration renames `TrainerProfile.hourlyRate` to `hourlyRateMinor` and adds 
 apps/
   api/                 NestJS REST API
   customer-web/        React customer application
-  admin-web/           React admin application (auth scaffold)
+  admin-web/           React admin application
 packages/              Shared packages (added when needed)
 prisma/                Database schema, migrations, and seed
 infra/                 Deployment-related files
@@ -184,7 +184,7 @@ The customer authentication and court-booking stabilization branch has been veri
 - Customer frontend Vitest regression test (1 test), TypeScript typecheck, and production build (user-confirmed local results).
 - GitHub Actions API and customer-web jobs passing on the stabilization branch.
 
-These checks do not imply that the planned admin/trainer interfaces, training products, payment integrations, or production security hardening are complete.
+The trainer-management branch adds new code and migrations that still require local typecheck, build, and test verification before the feature should be considered complete.
 
 ## Project status
 
