@@ -155,6 +155,10 @@ describe('TrainersService', () => {
     prisma.user.findMany.mockResolvedValue([user]);
     const [listedTrainer] = await service.findAll();
 
+    if (!listedTrainer) {
+      throw new Error('Expected the trainer to be returned by findAll().');
+    }
+
     expect(result.status).toBe(listedTrainer.status);
   });
 
