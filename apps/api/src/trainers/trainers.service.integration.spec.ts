@@ -8,6 +8,7 @@ import { TrainersService } from './trainers.service';
 const describeIfDatabase = process.env.DATABASE_URL ? describe : describe.skip;
 
 describeIfDatabase('TrainersService invitation acceptance (PostgreSQL integration)', () => {
+  jest.setTimeout(30_000);
   let prisma: PrismaService | undefined;
   let service: TrainersService;
   let trainerId: string | undefined;
