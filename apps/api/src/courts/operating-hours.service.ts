@@ -78,12 +78,16 @@ export class OperatingHoursService {
         (a, b) => a.startMinute - b.startMinute,
       );
 
-      for (let index = 1; index < sorted.length; index += 1) {
-        if (sorted[index].startMinute < sorted[index - 1].endMinute) {
+      let previous: (typeof sorted)[number] | undefined;
+
+      for (const interval of sorted) {
+        if (previous && interval.startMinute < previous.endMinute) {
           throw new BadRequestException(
             `Opening intervals overlap on ${day}.`,
           );
         }
+
+        previous = interval;
       }
     }
   }
