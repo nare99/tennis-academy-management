@@ -36,6 +36,7 @@ export default function CourtsPage() {
       name: values.name,
       surface: values.surface || null,
       isIndoor: values.isIndoor,
+      hasLights: values.hasLights,
     };
 
     try {
