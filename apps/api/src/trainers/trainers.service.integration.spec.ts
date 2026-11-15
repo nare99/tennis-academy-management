@@ -13,10 +13,11 @@ describeIfDatabase('TrainersService invitation acceptance (PostgreSQL integratio
   let trainerId: string | undefined;
 
   beforeAll(async () => {
-    prisma = new PrismaService();
-    await prisma.$connect();
+    const connectedPrisma = new PrismaService();
+    await connectedPrisma.$connect();
+    prisma = connectedPrisma;
     service = new TrainersService(
-      prisma,
+      connectedPrisma,
       new ConfigService({
         TRAINER_INVITATION_BASE_URL: 'http://localhost:5174/accept-invitation',
       }),
