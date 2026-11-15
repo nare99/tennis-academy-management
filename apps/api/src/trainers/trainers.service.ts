@@ -186,15 +186,36 @@ export class TrainersService {
         });
         await tx.authSession.deleteMany({ where: { userId: id } });
       }
-      const user = await tx.user.update({ where: { id }, data: { isActive } });
+      const user = await tx.user.update({
+        where: { id },
+        data: { isActive },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          isActive: true,
+          passwordHash: true,
+          trainerInvitations: {
+            select: { expiresAt: true, consumedAt: true },
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+          },
+        },
+      });
+      const latestInvitation = user.trainerInvitations[0];
+
       return {
-        id: user.id, email: user.email, name: user.name, role: user.role,
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
         isActive: user.isActive,
-        status: user.isActive
-          ? 'ACTIVE'
-          : user.passwordHash
-            ? 'INACTIVE'
-            : 'INVITATION_EXPIRED',
+        status: resolveTrainerStatus(
+          user.isActive,
+          user.passwordHash,
+          latestInvitation,
+        ),
       };
     });
   }
