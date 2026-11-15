@@ -8,7 +8,7 @@ import { TrainersService } from './trainers.service';
 const describeIfDatabase = process.env.DATABASE_URL ? describe : describe.skip;
 
 describeIfDatabase('TrainersService invitation acceptance (PostgreSQL integration)', () => {
-  let prisma: PrismaService;
+  let prisma: PrismaService | undefined;
   let service: TrainersService;
   let trainerId: string | undefined;
 
@@ -24,6 +24,7 @@ describeIfDatabase('TrainersService invitation acceptance (PostgreSQL integratio
   });
 
   afterAll(async () => {
+    if (!prisma) return;
     if (trainerId) {
       await prisma.user.deleteMany({ where: { id: trainerId } });
     }
