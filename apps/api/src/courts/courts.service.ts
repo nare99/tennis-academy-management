@@ -1,4 +1,3 @@
-
 import {
   BadRequestException,
   ConflictException,
@@ -34,6 +33,7 @@ export class CourtsService {
           name: dto.name.trim(),
           surface: dto.surface?.trim() || null,
           isIndoor: dto.isIndoor ?? false,
+          hasLights: dto.hasLights ?? false,
         },
       });
     } catch (error: unknown) {
@@ -64,6 +64,7 @@ export class CourtsService {
               ? undefined
               : dto.surface?.trim() || null,
           isIndoor: dto.isIndoor,
+          hasLights: dto.hasLights,
         },
       });
     } catch (error: unknown) {
