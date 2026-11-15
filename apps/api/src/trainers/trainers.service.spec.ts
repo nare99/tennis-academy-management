@@ -100,6 +100,126 @@ describe('TrainersService', () => {
     );
   });
 
+  it('returns the same expired-invitation status after deactivation as findAll', async () => {
+    const invitation = {
+      expiresAt: new Date(Date.now() + 60_000),
+      consumedAt: new Date(),
+    };
+    const user = {
+      id: 'trainer-1',
+      email: 'coach@example.com',
+      name: 'Coach One',
+      role: UserRole.TRAINER,
+      isActive: false,
+      passwordHash: null,
+      trainerInvitations: [invitation],
+    };
+    const tx = {
+      user: {
+        findFirst: jest.fn().mockResolvedValue({
+          id: user.id,
+          passwordHash: null,
+        }),
+        update: jest.fn().mockResolvedValue(user),
+      },
+      trainerInvitation: {
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+      },
+      authSession: {
+        deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
+      },
+    };
+    prisma.$transaction.mockImplementation(
+      (callback: (tx: unknown) => Promise<unknown>) => callback(tx),
+    );
+
+    const result = await service.updateStatus('trainer-1', false);
+
+    expect(tx.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({
+          trainerInvitations: expect.objectContaining({
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+          }),
+        }),
+      }),
+    );
+    expect(result.status).toBe('INVITATION_EXPIRED');
+  });
+
+  it('returns INACTIVE for a deactivated trainer who has already set a password', async () => {
+    const user = {
+      id: 'trainer-1',
+      email: 'coach@example.com',
+      name: 'Coach One',
+      role: UserRole.TRAINER,
+      isActive: false,
+      passwordHash: 'argon2-hash',
+      trainerInvitations: [],
+    };
+    const tx = {
+      user: {
+        findFirst: jest.fn().mockResolvedValue({
+          id: user.id,
+          passwordHash: user.passwordHash,
+        }),
+        update: jest.fn().mockResolvedValue(user),
+      },
+      trainerInvitation: {
+        updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+      },
+      authSession: {
+        deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
+      },
+    };
+    prisma.$transaction.mockImplementation(
+      (callback: (tx: unknown) => Promise<unknown>) => callback(tx),
+    );
+
+    const result = await service.updateStatus('trainer-1', false);
+
+    expect(result.status).toBe('INACTIVE');
+  });
+
+  it('updates user fields when the trainer profile does not exist', async () => {
+    const user = {
+      id: 'trainer-1',
+      email: 'coach@example.com',
+      name: 'Updated Coach',
+      role: UserRole.TRAINER,
+      isActive: false,
+      passwordHash: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const tx = {
+      user: {
+        findFirst: jest.fn().mockResolvedValue({
+          id: user.id,
+          passwordHash: null,
+          isActive: false,
+          trainerInvitations: [],
+        }),
+        update: jest.fn().mockResolvedValue(user),
+      },
+      trainerProfile: {
+        findUnique: jest.fn().mockResolvedValue(null),
+      },
+    };
+    prisma.$transaction.mockImplementation(
+      (callback: (tx: unknown) => Promise<unknown>) => callback(tx),
+    );
+
+    const result = await service.update('trainer-1', { name: 'Updated Coach' });
+
+    expect(tx.trainerProfile.findUnique).toHaveBeenCalledWith({
+      where: { userId: 'trainer-1' },
+    });
+    expect(result.name).toBe('Updated Coach');
+    expect(result.trainerProfile).toBeNull();
+  });
+
   it('rejects empty updates', async () => {
     await expect(service.update('trainer-1', {})).rejects.toBeInstanceOf(
       BadRequestException,
