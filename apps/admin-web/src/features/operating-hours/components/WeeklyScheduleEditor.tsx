@@ -24,7 +24,18 @@ function toTime(value: number): string {
 }
 
 function fromTime(value: string): number {
-  const [hours, minutes] = value.split(':').map(Number);
+  const match = /^(\\d{2}):(\\d{2})$/.exec(value);
+  if (!match) {
+    throw new Error('Invalid time value.');
+  }
+
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+
+  if (hours > 23 || minutes > 59) {
+    throw new Error('Invalid time value.');
+  }
+
   return hours * 60 + minutes;
 }
 
@@ -88,7 +99,11 @@ export default function WeeklyScheduleEditor({
                     type="time"
                     value={toTime(interval.startMinute)}
                     disabled={disabled}
-                    onChange={(event) => updateInterval(day, index, { startMinute: fromTime(event.target.value) })}
+                    onChange={(event) => {
+                      if (event.target.value) {
+                        updateInterval(day, index, { startMinute: fromTime(event.target.value) });
+                      }
+                    }}
                     className="rounded-lg border border-academy-line px-3 py-2 text-sm"
                   />
                   <span className="text-sm text-academy-muted">to</span>
@@ -98,7 +113,11 @@ export default function WeeklyScheduleEditor({
                     type="time"
                     value={interval.endMinute === 1440 ? '23:59' : toTime(interval.endMinute)}
                     disabled={disabled || interval.endMinute === 1440}
-                    onChange={(event) => updateInterval(day, index, { endMinute: fromTime(event.target.value) })}
+                    onChange={(event) => {
+                      if (event.target.value) {
+                        updateInterval(day, index, { endMinute: fromTime(event.target.value) });
+                      }
+                    }}
                     className="rounded-lg border border-academy-line px-3 py-2 text-sm"
                   />
                   <label className="flex items-center gap-1.5 text-xs text-academy-muted">
