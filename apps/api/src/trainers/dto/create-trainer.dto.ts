@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsEmail, IsInt, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength,
 } from 'class-validator';
@@ -10,6 +11,7 @@ export class CreateTrainerDto {
   email!: string;
 
   @ApiProperty({ example: 'Alex Morgan', minLength: 2, maxLength: 100 })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @MinLength(2)
   @MaxLength(100)

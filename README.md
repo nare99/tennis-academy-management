@@ -55,7 +55,7 @@ Use the dependency versions already declared in the workspace manifests; install
 5. Create and apply a development migration:
 
    ```bash
-   npm run db:migrate
+   npx prisma migrate dev --schema ./prisma/schema.prisma
    ```
 
 6. Add deterministic demo data:
@@ -151,8 +151,8 @@ npx prisma generate --schema ./prisma/schema.prisma
 | `npm run typecheck -w @tennis/customer-web` | Typecheck customer frontend |
 | `npm run db:up` | Start PostgreSQL |
 | `npm run db:down` | Stop local services |
-| `npm run db:migrate` | Create/apply a development migration |
-| `npm run db:deploy` | Apply committed migrations (workspace env loading still needs correction; use the root-level Prisma command above meanwhile) |
+| `npx prisma migrate dev --schema ./prisma/schema.prisma` | Create/apply a development migration from the repository root |
+| `npx prisma migrate deploy --schema ./prisma/schema.prisma` | Apply committed migrations from the repository root |
 | `npm run db:seed` | Seed repeatable demo courts and academy settings |
 | `npm run admin:provision -w @tennis/api` | Explicitly create/update an administrator |
 | `npm run db:studio` | Open Prisma Studio |
