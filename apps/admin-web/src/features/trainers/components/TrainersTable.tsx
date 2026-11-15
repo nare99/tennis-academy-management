@@ -43,8 +43,8 @@ export default function TrainersTable({ trainers, busyId, onEdit, onToggleStatus
             <td className="px-5 py-4">
               <div className="flex justify-end gap-3">
                 <button type="button" onClick={() => onEdit(trainer)} className="font-medium text-academy-green">Edit</button>
-                {trainer.status === 'INVITED' && <button type="button" disabled={busyId === trainer.id} onClick={() => onReissue(trainer)} className="font-medium text-academy-muted disabled:opacity-50">Reissue invite</button>}
-                {trainer.status !== 'INVITED' && <button type="button" disabled={busyId === trainer.id} onClick={() => onToggleStatus(trainer)} className="font-medium text-academy-muted disabled:opacity-50">{trainer.isActive ? 'Deactivate' : 'Activate'}</button>}
+                {(trainer.status === 'INVITED' || trainer.status === 'INVITATION_EXPIRED') && <button type="button" disabled={busyId === trainer.id} onClick={() => onReissue(trainer)} className="font-medium text-academy-muted disabled:opacity-50">Reissue invite</button>}
+                {trainer.status !== 'INVITED' && trainer.status !== 'INVITATION_EXPIRED' && <button type="button" disabled={busyId === trainer.id} onClick={() => onToggleStatus(trainer)} className="font-medium text-academy-muted disabled:opacity-50">{trainer.isActive ? 'Deactivate' : 'Activate'}</button>}
               </div>
             </td>
           </tr>)}

@@ -25,13 +25,13 @@ export class TrainersService {
     const trainers = await this.prisma.user.findMany({
       where: { role: UserRole.TRAINER },
       select: {
-        id: true, email: true, name: true, role: true, isActive: true, createdAt: true, updatedAt: true,
+        id: true, email: true, name: true, role: true, isActive: true, passwordHash: true,
+        createdAt: true, updatedAt: true,
         trainerProfile: {
           select: { id: true, bio: true, hourlyRateMinor: true, currency: true, createdAt: true, updatedAt: true },
         },
         trainerInvitations: {
-          where: { consumedAt: null, expiresAt: { gt: now } },
-          select: { expiresAt: true },
+          select: { expiresAt: true, consumedAt: true },
           orderBy: { createdAt: 'desc' },
           take: 1,
         },
@@ -39,11 +39,22 @@ export class TrainersService {
       orderBy: { name: 'asc' },
     });
 
-    return trainers.map(({ trainerInvitations, ...trainer }) => ({
-      ...trainer,
-      status: trainer.isActive ? 'ACTIVE' : trainerInvitations.length ? 'INVITED' : 'INACTIVE',
-      invitationExpiresAt: trainerInvitations[0]?.expiresAt ?? null,
-    }));
+    return trainers.map(({ trainerInvitations, passwordHash, ...trainer }) => {
+      const latestInvitation = trainerInvitations[0];
+      const status = trainer.isActive
+        ? 'ACTIVE'
+        : !passwordHash
+          ? latestInvitation && !latestInvitation.consumedAt && latestInvitation.expiresAt > now
+            ? 'INVITED'
+            : 'INVITATION_EXPIRED'
+          : 'INACTIVE';
+
+      return {
+        ...trainer,
+        status,
+        invitationExpiresAt: latestInvitation?.expiresAt ?? null,
+      };
+    });
   }
 
   async create(dto: CreateTrainerDto) {

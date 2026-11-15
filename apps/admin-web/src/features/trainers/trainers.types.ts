@@ -1,4 +1,4 @@
-export type TrainerStatus = 'ACTIVE' | 'INVITED' | 'INACTIVE';
+export type TrainerStatus = 'ACTIVE' | 'INVITED' | 'INVITATION_EXPIRED' | 'INACTIVE';
 
 export type Trainer = {
   id: string;
