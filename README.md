@@ -1,6 +1,6 @@
 # Tennis Academy Management
 
-A portfolio project for managing a single tennis academy. The current implementation includes a NestJS API and a customer-facing React application for browsing courts, checking availability, creating court bookings, and managing a customer's bookings.
+A portfolio project for managing a single tennis academy. The current implementation includes a NestJS API and customer-facing React application for browsing courts, checking availability, creating court bookings, and managing a customer's bookings.
 
 Court booking is the currently implemented customer workflow. The admin frontend includes authentication, court/operating-hours management, and trainer management with invitation-based account activation. Individual lessons, recurring group training, online/offline payments, and the trainer frontend remain planned work unless explicitly listed as implemented below.
 
@@ -127,7 +127,7 @@ The admin application exposes trainer management at `/trainers`. An administrato
 
 New trainer accounts are created inactive and without a password. The API creates a cryptographically random invitation token, stores only its SHA-256 hash, and returns the invitation URL to the authenticated administrator. The administrator must copy and send the link manually until an email provider is integrated. Invitations expire after seven days and are single-use. The trainer sets their own password on the public `/accept-invitation` page; successful acceptance activates the account. The trainer then signs in through the normal login page.
 
-Set `TRAINER_INVITATION_BASE_URL` in the root `.env` to the externally reachable admin frontend URL plus `/accept-invitation`. The development default is `http://localhost:5174/accept-invitation`. Production configuration requires this variable.
+Set `TRAINER_INVITATION_BASE_URL` in the root `.env` to the externally reachable admin frontend URL plus `/accept-invitation`. The development default is `http://localhost:5174/accept-invitation`. Production configuration requires this variable and rejects non-HTTPS URLs.
 
 The trainer-management migration renames `TrainerProfile.hourlyRate` to `hourlyRateMinor` and adds the `TrainerInvitation` table; it does not drop existing trainer profile data.
 
@@ -164,7 +164,7 @@ Do not use `migrate dev` as a production deployment command; production and othe
 | `npm run build -w @tennis/customer-web` | Build customer frontend |
 | `npm run lint` | Lint API TypeScript |
 | `npm run typecheck` | Typecheck API |
-| `npm test` | Run API unit tests |
+| `npm test` | Run API unit and database-backed integration tests (integration tests run when `DATABASE_URL` is set) |
 | `npm run test -w @tennis/customer-web` | Run customer frontend tests once |
 | `npm run test:watch -w @tennis/customer-web` | Run customer frontend tests in watch mode |
 | `npm run typecheck -w @tennis/customer-web` | Typecheck customer frontend |
@@ -203,18 +203,19 @@ The admin frontend includes court, operating-hours, and trainer management. The 
 
 ## Verification
 
-The trainer-management branch has been locally verified by the developer:
+The GitHub Actions API job provisions PostgreSQL, applies every committed Prisma migration to a clean database, generates Prisma Client, and runs API lint, typecheck, Jest tests, and the production build. The Jest suite includes a database-backed race test proving that only one concurrent request can accept a trainer invitation. The admin and customer frontend jobs run their configured typecheck/build checks; the customer job also runs its frontend tests.
 
-- Trainer-invitation database migration applied successfully (all five migrations found; the trainer-invitations migration applied).
-- Prisma Client generated successfully with Prisma 6.19.3.
-- API TypeScript typecheck passed.
-- API Jest tests: 9 suites / 52 tests passed.
-- API ESLint, TypeScript typecheck, and production build passed.
-- Admin frontend TypeScript typecheck and production build passed (Vite 6.4.5).
-- Manual end-to-end trainer invitation workflow passed: an administrator created a trainer and copied the invitation link; the trainer opened it in a private browser window, set a password, and the account became active and visible in the admin interface.
+To run the database-backed API tests locally from the repository root, start the database and apply migrations first:
 
-The Jest run emits TS151002 from ts-jest about `isolatedModules` with the current hybrid TypeScript module kind. Tests pass; the warning remains to be investigated rather than suppressed. These are developer-reported local results, not a claim that GitHub Actions has passed on this branch.
+```powershell
+npm run db:up
+npx prisma migrate deploy --schema ./prisma/schema.prisma
+$env:DATABASE_URL = "postgresql://tennis:tennis_dev_password@localhost:5432/tennis_academy?schema=public"
+npm test -- --runInBand
+```
+
+The integration test is skipped when `DATABASE_URL` is not set. CI always sets it and runs against a disposable PostgreSQL service. These commands verify the current checkout; do not treat older local results as verification of later changes.
 
 ## Project status
 
-The project has a working API foundation, a customer court-booking workflow, and initial admin management for courts, operating hours, and trainers. Trainer account activation uses hashed, expiring, single-use invitations and has passed local automated and manual end-to-end verification. The trainer-facing interface, lessons, group training, payments, and remaining production-hardening tasks are future work. See [the customer application stabilization plan](docs/CUSTOMER-APP-STABILIZATION-PLAN.md) for detailed verification and outstanding items.
+The project has a working API foundation, a customer court-booking workflow, and initial admin management for courts, operating hours, and trainers. Trainer account activation uses hashed, expiring, single-use invitations. The trainer-facing interface, lessons, group training, payments, and remaining production-hardening tasks are future work. See [the customer application stabilization plan](docs/CUSTOMER-APP-STABILIZATION-PLAN.md) for detailed verification and outstanding items.
