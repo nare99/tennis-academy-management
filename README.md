@@ -1,8 +1,8 @@
 # Tennis Academy Management
 
-A portfolio project for managing a single tennis academy. The current implementation includes a NestJS API and a customer-facing React application for browsing courts, checking availability, creating court bookings, and managing a customer's bookings.
+A portfolio project for managing a single tennis academy. The current implementation includes a NestJS API and customer-facing React application for browsing courts, checking availability, creating court bookings, and managing a customer's bookings.
 
-Court booking is the currently implemented customer workflow. The admin frontend has an authentication scaffold, but admin management workflows are not implemented yet. Individual lessons, recurring group training, online/offline payments, and the trainer frontend remain planned work unless explicitly listed as implemented below.
+Court booking is the currently implemented customer workflow. The admin frontend includes authentication, court/operating-hours management, and trainer management with invitation-based account activation. Individual lessons, recurring group training, online/offline payments, and the trainer frontend remain planned work unless explicitly listed as implemented below.
 
 ## Stack
 
@@ -46,17 +46,19 @@ Use the dependency versions already declared in the workspace manifests; install
    npm run db:up
    ```
 
-4. Generate Prisma Client:
+4. Generate Prisma Client from the repository root:
 
    ```bash
-   npm run prisma:generate -w @tennis/api
+   npx prisma generate --schema ./prisma/schema.prisma
    ```
 
-5. Create and apply a development migration:
+5. Apply the migrations already committed to the repository:
 
    ```bash
-   npm run db:migrate
+   npx prisma migrate deploy --schema ./prisma/schema.prisma
    ```
+
+   Run this command from the repository root. The Prisma schema and root `.env` file are located there; do not run the migration command from `apps/api`.
 
 6. Add deterministic demo data:
 
@@ -76,12 +78,19 @@ Use the dependency versions already declared in the workspace manifests; install
    npm run dev -w @tennis/customer-web
    ```
 
-9. Open:
+9. Start the admin application in another terminal:
+
+   ```bash
+   npm run dev -w @tennis/admin-web
+   ```
+
+10. Open:
    - Customer application: http://localhost:5173
+   - Admin application: http://localhost:5174
    - Swagger API documentation: http://localhost:3001/docs
    - API health endpoint: http://localhost:3001/health
 
-The Vite development servers proxy `/api` requests to `http://localhost:3001`. Keep the API running while using either frontend.
+The Vite development servers proxy `/api` requests to `http://localhost:3001`. Keep the API running while using either frontend. Run only one API development process at a time.
 
 ### Provision a local administrator
 
@@ -110,7 +119,39 @@ Use a unique password of at least 12 characters. The command creates the adminis
 - View the authenticated customer's bookings.
 - Cancel eligible upcoming bookings; the API enforces ownership and cancellation rules.
 
-The API exposes admin-only court management endpoints. The admin frontend currently has its authentication foundation and placeholder dashboard; court-management screens are still planned.
+The API exposes admin-only court management endpoints. The admin frontend includes authenticated admin-only court and trainer management, including trainer invitation creation and acceptance.
+
+## Trainer administration
+
+The admin application exposes trainer management at `/trainers`. An administrator can create a trainer profile, update its details and hourly rate, deactivate/reactivate an activated trainer, and reissue an expired or lost invitation.
+
+New trainer accounts are created inactive and without a password. The API creates a cryptographically random invitation token, stores only its SHA-256 hash, and returns the invitation URL to the authenticated administrator. The administrator must copy and send the link manually until an email provider is integrated. Invitations expire after seven days and are single-use. The trainer sets their own password on the public `/accept-invitation` page; successful acceptance activates the account. The trainer then signs in through the normal login page.
+
+Set `TRAINER_INVITATION_BASE_URL` in the root `.env` to the externally reachable admin frontend URL plus `/accept-invitation`. The development default is `http://localhost:5174/accept-invitation`. Production configuration requires this variable and rejects non-HTTPS URLs.
+
+The trainer-management migration renames `TrainerProfile.hourlyRate` to `hourlyRateMinor` and adds the `TrainerInvitation` table; it does not drop existing trainer profile data.
+
+Run Prisma commands from the repository root so Prisma can resolve `prisma/schema.prisma` and the root `.env` file. Use the following commands for the corresponding workflows:
+
+- Apply migrations committed to the repository (fresh local database or deployment):
+
+  ```bash
+  npx prisma migrate deploy --schema ./prisma/schema.prisma
+  ```
+
+- After changing `prisma/schema.prisma` during development, create and apply a new migration (replace the example name):
+
+  ```bash
+  npx prisma migrate dev --schema ./prisma/schema.prisma --name add_descriptive_change
+  ```
+
+- Regenerate Prisma Client after schema changes or when required by the setup:
+
+  ```bash
+  npx prisma generate --schema ./prisma/schema.prisma
+  ```
+
+Do not use `migrate dev` as a production deployment command; production and other deployment environments should apply committed migrations with `migrate deploy`.
 
 ## Useful commands
 
@@ -118,18 +159,19 @@ The API exposes admin-only court management endpoints. The admin frontend curren
 | --- | --- |
 | `npm run dev:api` | Start API in watch mode |
 | `npm run dev -w @tennis/customer-web` | Start customer frontend |
+| `npm run dev -w @tennis/admin-web` | Start admin frontend |
 | `npm run build` | Build the API |
 | `npm run build -w @tennis/customer-web` | Build customer frontend |
 | `npm run lint` | Lint API TypeScript |
 | `npm run typecheck` | Typecheck API |
-| `npm test` | Run API unit tests |
+| `npm test` | Run API unit and database-backed integration tests (integration tests run when `DATABASE_URL` is set) |
 | `npm run test -w @tennis/customer-web` | Run customer frontend tests once |
 | `npm run test:watch -w @tennis/customer-web` | Run customer frontend tests in watch mode |
 | `npm run typecheck -w @tennis/customer-web` | Typecheck customer frontend |
 | `npm run db:up` | Start PostgreSQL |
 | `npm run db:down` | Stop local services |
-| `npm run db:migrate` | Create/apply a development migration |
-| `npm run db:deploy` | Apply committed migrations |
+| `npx prisma migrate dev --schema ./prisma/schema.prisma` | Create/apply a development migration from the repository root |
+| `npx prisma migrate deploy --schema ./prisma/schema.prisma` | Apply committed migrations from the repository root |
 | `npm run db:seed` | Seed repeatable demo courts and academy settings |
 | `npm run admin:provision -w @tennis/api` | Explicitly create/update an administrator |
 | `npm run db:studio` | Open Prisma Studio |
@@ -140,14 +182,14 @@ The API exposes admin-only court management endpoints. The admin frontend curren
 apps/
   api/                 NestJS REST API
   customer-web/        React customer application
-  admin-web/           React admin application (auth scaffold)
+  admin-web/           React admin application
 packages/              Shared packages (added when needed)
 prisma/                Database schema, migrations, and seed
 infra/                 Deployment-related files
 docs/                  Architecture decisions and implementation plans
 ```
 
-The admin frontend scaffold is present, but its management workflows are not yet implemented. The trainer frontend, individual lessons, recurring group training, and payment workflows are also planned rather than completed features.
+The admin frontend includes court, operating-hours, and trainer management. The trainer frontend, individual lessons, recurring group training, and payment workflows remain planned.
 
 ## Security and operational notes
 
@@ -161,14 +203,19 @@ The admin frontend scaffold is present, but its management workflows are not yet
 
 ## Verification
 
-The customer authentication and court-booking stabilization branch has been verified with:
+The GitHub Actions API job provisions PostgreSQL, applies every committed Prisma migration to a clean database, generates Prisma Client, and runs API lint, typecheck, Jest tests, and the production build. The Jest suite includes a database-backed race test proving that only one concurrent request can accept a trainer invitation. The admin and customer frontend jobs run their configured typecheck/build checks; the customer job also runs its frontend tests.
 
-- API lint, TypeScript typecheck, 6 Jest suites / 30 tests, and production build (user-confirmed local results).
-- Customer frontend Vitest regression test (1 test), TypeScript typecheck, and production build (user-confirmed local results).
-- GitHub Actions API and customer-web jobs passing on the stabilization branch.
+To run the database-backed API tests locally from the repository root, start the database and apply migrations first:
 
-These checks do not imply that the planned admin/trainer interfaces, training products, payment integrations, or production security hardening are complete.
+```powershell
+npm run db:up
+npx prisma migrate deploy --schema ./prisma/schema.prisma
+$env:DATABASE_URL = "postgresql://tennis:tennis_dev_password@localhost:5432/tennis_academy?schema=public"
+npm test -- --runInBand
+```
+
+The integration test is skipped when `DATABASE_URL` is not set. CI always sets it and runs against a disposable PostgreSQL service. These commands verify the current checkout; do not treat older local results as verification of later changes.
 
 ## Project status
 
-The project has a working API foundation and a customer court-booking workflow. Authentication, court browsing/availability, customer booking history, and cancellation are implemented. The admin/trainer interfaces, lessons, group training, payments, and remaining production-hardening tasks are future work. See [the customer application stabilization plan](docs/CUSTOMER-APP-STABILIZATION-PLAN.md) for detailed verification and outstanding items.
+The project has a working API foundation, a customer court-booking workflow, and initial admin management for courts, operating hours, and trainers. Trainer account activation uses hashed, expiring, single-use invitations. The trainer-facing interface, lessons, group training, payments, and remaining production-hardening tasks are future work. See [the customer application stabilization plan](docs/CUSTOMER-APP-STABILIZATION-PLAN.md) for detailed verification and outstanding items.

@@ -5,6 +5,8 @@ import Login from '../pages/auth/Login';
 import Dashboard from '../pages/dashboard/Dashboard';
 import CourtsPage from '../features/courts/pages/CourtsPage';
 import OperatingHoursPage from '../features/operating-hours/pages/OperatingHoursPage';
+import TrainersPage from '../features/trainers/pages/TrainersPage';
+import AcceptTrainerInvitationPage from '../pages/auth/AcceptTrainerInvitationPage';
 import AdminLayout from '../layouts/AdminLayout';
 import AppProviders from './providers';
 
@@ -13,6 +15,7 @@ export default function App() {
     <AppProviders>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/accept-invitation" element={<AcceptTrainerInvitationPage />} />
 
         <Route element={<RequireAdmin />}>
           <Route element={<AdminLayout />}>
@@ -23,6 +26,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/courts" element={<CourtsPage />} />
             <Route path="/operating-hours" element={<OperatingHoursPage />} />
+            <Route path="/trainers" element={<TrainersPage />} />
           </Route>
         </Route>
 
