@@ -46,10 +46,10 @@ Use the dependency versions already declared in the workspace manifests; install
    npm run db:up
    ```
 
-4. Generate Prisma Client:
+4. Generate Prisma Client from the repository root:
 
    ```bash
-   npm run prisma:generate -w @tennis/api
+   npx prisma generate --schema ./prisma/schema.prisma
    ```
 
 5. Create and apply a development migration:
@@ -76,12 +76,19 @@ Use the dependency versions already declared in the workspace manifests; install
    npm run dev -w @tennis/customer-web
    ```
 
-9. Start the admin application in another terminal:\n\n   ```bash\n   npm run dev -w @tennis/admin-web\n   ```\n\n10. Open:
+9. Start the admin application in another terminal:
+
+   ```bash
+   npm run dev -w @tennis/admin-web
+   ```
+
+10. Open:
    - Customer application: http://localhost:5173
+   - Admin application: http://localhost:5174
    - Swagger API documentation: http://localhost:3001/docs
    - API health endpoint: http://localhost:3001/health
 
-The Vite development servers proxy `/api` requests to `http://localhost:3001`. Keep the API running while using either frontend.
+The Vite development servers proxy `/api` requests to `http://localhost:3001`. Keep the API running while using either frontend. Run only one API development process at a time.
 
 ### Provision a local administrator
 
@@ -120,21 +127,20 @@ New trainer accounts are created inactive and without a password. The API create
 
 Set `TRAINER_INVITATION_BASE_URL` in the root `.env` to the externally reachable admin frontend URL plus `/accept-invitation`. The development default is `http://localhost:5174/accept-invitation`. Production configuration requires this variable.
 
-After pulling the trainer-management branch, apply the committed database migration and regenerate Prisma Client:
+The trainer-management migration renames `TrainerProfile.hourlyRate` to `hourlyRateMinor` and adds the `TrainerInvitation` table; it does not drop existing trainer profile data. From the repository root, apply committed migrations and regenerate Prisma Client with:
 
-```bash
-npm run db:deploy
-npm run prisma:generate -w @tennis/api
+```powershell
+npx prisma migrate deploy --schema ./prisma/schema.prisma
+npx prisma generate --schema ./prisma/schema.prisma
 ```
-
-The migration renames `TrainerProfile.hourlyRate` to `hourlyRateMinor` and adds the `TrainerInvitation` table; it does not drop existing trainer profile data.
 
 ## Useful commands
 
 | Command | Purpose |
 | --- | --- |
 | `npm run dev:api` | Start API in watch mode |
-| `npm run dev -w @tennis/customer-web` | Start customer frontend |\n| `npm run dev -w @tennis/admin-web` | Start admin frontend |
+| `npm run dev -w @tennis/customer-web` | Start customer frontend |
+| `npm run dev -w @tennis/admin-web` | Start admin frontend |
 | `npm run build` | Build the API |
 | `npm run build -w @tennis/customer-web` | Build customer frontend |
 | `npm run lint` | Lint API TypeScript |
@@ -146,7 +152,7 @@ The migration renames `TrainerProfile.hourlyRate` to `hourlyRateMinor` and adds 
 | `npm run db:up` | Start PostgreSQL |
 | `npm run db:down` | Stop local services |
 | `npm run db:migrate` | Create/apply a development migration |
-| `npm run db:deploy` | Apply committed migrations |
+| `npm run db:deploy` | Apply committed migrations (workspace env loading still needs correction; use the root-level Prisma command above meanwhile) |
 | `npm run db:seed` | Seed repeatable demo courts and academy settings |
 | `npm run admin:provision -w @tennis/api` | Explicitly create/update an administrator |
 | `npm run db:studio` | Open Prisma Studio |
@@ -164,7 +170,7 @@ infra/                 Deployment-related files
 docs/                  Architecture decisions and implementation plans
 ```
 
-The admin frontend now includes court, operating-hours, and trainer management. The trainer frontend, individual lessons, recurring group training, and payment workflows remain planned.
+The admin frontend includes court, operating-hours, and trainer management. The trainer frontend, individual lessons, recurring group training, and payment workflows remain planned.
 
 ## Security and operational notes
 
@@ -178,14 +184,18 @@ The admin frontend now includes court, operating-hours, and trainer management. 
 
 ## Verification
 
-The customer authentication and court-booking stabilization branch has been verified with:
+The trainer-management branch has been locally verified by the developer:
 
-- API lint, TypeScript typecheck, 6 Jest suites / 30 tests, and production build (user-confirmed local results).
-- Customer frontend Vitest regression test (1 test), TypeScript typecheck, and production build (user-confirmed local results).
-- GitHub Actions API and customer-web jobs passing on the stabilization branch.
+- Trainer-invitation database migration applied successfully (all five migrations found; the trainer-invitations migration applied).
+- Prisma Client generated successfully with Prisma 6.19.3.
+- API TypeScript typecheck passed.
+- API Jest tests: 8 suites / 46 tests passed.
+- API production build passed.
+- Admin frontend TypeScript typecheck and production build passed (Vite 6.4.5).
+- Manual end-to-end trainer invitation workflow passed: an administrator created a trainer and copied the invitation link; the trainer opened it in a private browser window, set a password, and the account became active and visible in the admin interface.
 
-The trainer-management branch adds new code and migrations that still require local typecheck, build, and test verification before the feature should be considered complete.
+The Jest run emits TS151002 from ts-jest about `isolatedModules` with the current hybrid TypeScript module kind. Tests pass; the warning remains to be investigated rather than suppressed. These are developer-reported local results, not a claim that GitHub Actions has passed on this branch.
 
 ## Project status
 
-The project has a working API foundation, a customer court-booking workflow, and initial admin management for courts, operating hours, and trainers. Trainer account activation uses hashed, expiring, single-use invitations. The trainer-facing interface, lessons, group training, payments, and remaining production-hardening tasks are future work. See [the customer application stabilization plan](docs/CUSTOMER-APP-STABILIZATION-PLAN.md) for detailed verification and outstanding items.
+The project has a working API foundation, a customer court-booking workflow, and initial admin management for courts, operating hours, and trainers. Trainer account activation uses hashed, expiring, single-use invitations and has passed local automated and manual end-to-end verification. The trainer-facing interface, lessons, group training, payments, and remaining production-hardening tasks are future work. See [the customer application stabilization plan](docs/CUSTOMER-APP-STABILIZATION-PLAN.md) for detailed verification and outstanding items.
