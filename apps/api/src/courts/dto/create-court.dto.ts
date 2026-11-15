@@ -1,4 +1,3 @@
-
 import {
   IsBoolean,
   IsOptional,
@@ -25,4 +24,9 @@ export class CreateCourtDto {
   @IsOptional()
   @IsBoolean()
   isIndoor?: boolean;
+
+  @ApiPropertyOptional({ example: true, default: false })
+  @IsOptional()
+  @IsBoolean()
+  hasLights?: boolean;
 }
