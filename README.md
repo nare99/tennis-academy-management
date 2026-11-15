@@ -139,7 +139,7 @@ Run Prisma commands from the repository root so Prisma can resolve `prisma/schem
   npx prisma migrate deploy --schema ./prisma/schema.prisma
   ```
 
-- After changing `prisma/schema.prisma during development, create and apply a new migration (replace the example name):
+- After changing `prisma/schema.prisma` during development, create and apply a new migration (replace the example name):
 
   ```bash
   npx prisma migrate dev --schema ./prisma/schema.prisma --name add_descriptive_change
