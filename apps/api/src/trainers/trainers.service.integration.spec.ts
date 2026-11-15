@@ -34,11 +34,13 @@ describeIfDatabase('TrainersService invitation acceptance (PostgreSQL integratio
   });
 
   it('allows exactly one of two concurrent requests to consume the same invitation', async () => {
+    const database = prisma;
+    if (!database) throw new Error('PostgreSQL integration client was not initialized.');
     const email = `trainer-invitation-race-${randomUUID()}@example.test`;
     const token = randomBytes(32).toString('base64url');
     const tokenHash = createHash('sha256').update(token).digest('hex');
 
-    const trainer = await prisma.user.create({
+    const trainer = await database.user.create({
       data: {
         email,
         name: 'Concurrent Invitation Test',
@@ -48,7 +50,7 @@ describeIfDatabase('TrainersService invitation acceptance (PostgreSQL integratio
     });
     trainerId = trainer.id;
 
-    const invitation = await prisma.trainerInvitation.create({
+    const invitation = await database.trainerInvitation.create({
       data: {
         userId: trainer.id,
         tokenHash,
@@ -76,10 +78,10 @@ describeIfDatabase('TrainersService invitation acceptance (PostgreSQL integratio
     }
 
     const [storedInvitation, storedTrainer] = await Promise.all([
-      prisma.trainerInvitation.findUniqueOrThrow({
+      database.trainerInvitation.findUniqueOrThrow({
         where: { id: invitation.id },
       }),
-      prisma.user.findUniqueOrThrow({
+      database.user.findUniqueOrThrow({
         where: { id: trainer.id },
       }),
     ]);
