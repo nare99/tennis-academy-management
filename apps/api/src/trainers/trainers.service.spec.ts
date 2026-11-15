@@ -7,11 +7,11 @@ import { TrainersService } from './trainers.service';
 
 describe('TrainersService', () => {
   let service: TrainersService;
-  let prisma: { $transaction: jest.Mock };
+  let prisma: { $transaction: jest.Mock; trainerInvitation: { findUnique: jest.Mock } };
   const config = { get: jest.fn().mockReturnValue('http://localhost:5174/accept-invitation') };
 
   beforeEach(() => {
-    prisma = { $transaction: jest.fn() };
+    prisma = { $transaction: jest.fn(), trainerInvitation: { findUnique: jest.fn() } };
     service = new TrainersService(prisma as unknown as PrismaService, config as unknown as ConfigService);
     jest.clearAllMocks();
   });
