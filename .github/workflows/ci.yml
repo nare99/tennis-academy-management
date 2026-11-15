@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, master, feature/admin-web]
+    branches: [main, master, feature/admin-web, feature/trainers-management]
   pull_request:
 
 jobs:

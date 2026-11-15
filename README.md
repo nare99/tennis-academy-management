@@ -76,7 +76,7 @@ Use the dependency versions already declared in the workspace manifests; install
    npm run dev -w @tennis/customer-web
    ```
 
-9. Open:
+9. Start the admin application in another terminal:\n\n   ```bash\n   npm run dev -w @tennis/admin-web\n   ```\n\n10. Open:
    - Customer application: http://localhost:5173
    - Swagger API documentation: http://localhost:3001/docs
    - API health endpoint: http://localhost:3001/health
