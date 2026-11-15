@@ -15,8 +15,6 @@ async function main(): Promise<void> {
     create: { name: 'Court 2', surface: 'Clay', isIndoor: true },
   });
 
-  console.log('Seed completed: demo courts and academy settings are available.');
-
   await prisma.academySettings.upsert({
     where: { id: 'academy' },
     update: {
@@ -31,6 +29,8 @@ async function main(): Promise<void> {
       peakEndMinute: 21 * 60,
     },
   });
+
+  console.log('Seed completed: demo courts and academy settings are available.');
 }
 
 main()
