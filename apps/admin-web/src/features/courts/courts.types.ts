@@ -13,6 +13,7 @@ export type CourtInput = {
   name: string;
   surface: string | null;
   isIndoor: boolean;
+  hasLights: boolean;
 };
 
 export type UpdateCourtStatusInput = {
