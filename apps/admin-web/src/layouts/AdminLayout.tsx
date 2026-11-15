@@ -7,6 +7,7 @@ const navigation = [
   { label: 'Dashboard', path: '/dashboard' },
   { label: 'Courts', path: '/courts' },
   { label: 'Operating hours', path: '/operating-hours' },
+  { label: 'Trainers', path: '/trainers' },
 ];
 
 export default function AdminLayout() {

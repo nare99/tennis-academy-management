@@ -2,7 +2,7 @@
 
 A portfolio project for managing a single tennis academy. The current implementation includes a NestJS API and a customer-facing React application for browsing courts, checking availability, creating court bookings, and managing a customer's bookings.
 
-Court booking is the currently implemented customer workflow. The admin frontend has an authentication scaffold, but admin management workflows are not implemented yet. Individual lessons, recurring group training, online/offline payments, and the trainer frontend remain planned work unless explicitly listed as implemented below.
+Court booking is the currently implemented customer workflow. The admin frontend includes authentication, court/operating-hours management, and trainer management with invitation-based account activation. Individual lessons, recurring group training, online/offline payments, and the trainer frontend remain planned work unless explicitly listed as implemented below.
 
 ## Stack
 
@@ -110,7 +110,7 @@ Use a unique password of at least 12 characters. The command creates the adminis
 - View the authenticated customer's bookings.
 - Cancel eligible upcoming bookings; the API enforces ownership and cancellation rules.
 
-The API exposes admin-only court management endpoints. The admin frontend currently has its authentication foundation and placeholder dashboard; court-management screens are still planned.
+The API exposes admin-only court management endpoints. The admin frontend includes authenticated admin-only court and trainer management, including trainer invitation creation and acceptance.
 
 ## Useful commands
 
@@ -147,7 +147,7 @@ infra/                 Deployment-related files
 docs/                  Architecture decisions and implementation plans
 ```
 
-The admin frontend scaffold is present, but its management workflows are not yet implemented. The trainer frontend, individual lessons, recurring group training, and payment workflows are also planned rather than completed features.
+The admin frontend now includes court, operating-hours, and trainer management. The trainer frontend, individual lessons, recurring group training, and payment workflows remain planned.
 
 ## Security and operational notes
 
@@ -171,4 +171,4 @@ These checks do not imply that the planned admin/trainer interfaces, training pr
 
 ## Project status
 
-The project has a working API foundation and a customer court-booking workflow. Authentication, court browsing/availability, customer booking history, and cancellation are implemented. The admin/trainer interfaces, lessons, group training, payments, and remaining production-hardening tasks are future work. See [the customer application stabilization plan](docs/CUSTOMER-APP-STABILIZATION-PLAN.md) for detailed verification and outstanding items.
+The project has a working API foundation, a customer court-booking workflow, and initial admin management for courts, operating hours, and trainers. Trainer account activation uses hashed, expiring, single-use invitations. The trainer-facing interface, lessons, group training, payments, and remaining production-hardening tasks are future work. See [the customer application stabilization plan](docs/CUSTOMER-APP-STABILIZATION-PLAN.md) for detailed verification and outstanding items.
