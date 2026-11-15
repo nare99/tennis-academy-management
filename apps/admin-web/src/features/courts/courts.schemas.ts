@@ -11,6 +11,7 @@ export const courtSchema = z.object({
     .trim()
     .max(50, 'Surface must be 50 characters or fewer.'),
   isIndoor: z.boolean(),
+  hasLights: z.boolean(),
 });
 
 export type CourtFormValues = z.infer<typeof courtSchema>;
