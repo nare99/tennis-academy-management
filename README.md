@@ -52,11 +52,13 @@ Use the dependency versions already declared in the workspace manifests; install
    npx prisma generate --schema ./prisma/schema.prisma
    ```
 
-5. Create and apply a development migration:
+5. Apply the migrations already committed to the repository:
 
    ```bash
-   npx prisma migrate dev --schema ./prisma/schema.prisma
+   npx prisma migrate deploy --schema ./prisma/schema.prisma
    ```
+
+   Run this command from the repository root. The Prisma schema and root `.env` file are located there; do not run the migration command from `apps/api`.
 
 6. Add deterministic demo data:
 
@@ -127,12 +129,29 @@ New trainer accounts are created inactive and without a password. The API create
 
 Set `TRAINER_INVITATION_BASE_URL` in the root `.env` to the externally reachable admin frontend URL plus `/accept-invitation`. The development default is `http://localhost:5174/accept-invitation`. Production configuration requires this variable.
 
-The trainer-management migration renames `TrainerProfile.hourlyRate` to `hourlyRateMinor` and adds the `TrainerInvitation` table; it does not drop existing trainer profile data. From the repository root, apply committed migrations and regenerate Prisma Client with:
+The trainer-management migration renames `TrainerProfile.hourlyRate` to `hourlyRateMinor` and adds the `TrainerInvitation` table; it does not drop existing trainer profile data.
 
-```powershell
-npx prisma migrate deploy --schema ./prisma/schema.prisma
-npx prisma generate --schema ./prisma/schema.prisma
-```
+Run Prisma commands from the repository root so Prisma can resolve `prisma/schema.prisma` and the root `.env` file. Use the following commands for the corresponding workflows:
+
+- Apply migrations committed to the repository (fresh local database or deployment):
+
+  ```bash
+  npx prisma migrate deploy --schema ./prisma/schema.prisma
+  ```
+
+- After changing `prisma/schema.prisma during development, create and apply a new migration (replace the example name):
+
+  ```bash
+  npx prisma migrate dev --schema ./prisma/schema.prisma --name add_descriptive_change
+  ```
+
+- Regenerate Prisma Client after schema changes or when required by the setup:
+
+  ```bash
+  npx prisma generate --schema ./prisma/schema.prisma
+  ```
+
+Do not use `migrate dev` as a production deployment command; production and other deployment environments should apply committed migrations with `migrate deploy`.
 
 ## Useful commands
 
