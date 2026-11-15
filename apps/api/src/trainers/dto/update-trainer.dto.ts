@@ -1,18 +1,27 @@
 import { Transform } from 'class-transformer';
 import {
-  IsEmail, IsInt, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength,
+  IsEmail,
+  IsInt,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+  ValidateIf,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateTrainerDto {
   @ApiPropertyOptional({ example: 'alex.trainer@example.com', maxLength: 254 })
-  @IsOptional()
+  @ValidateIf((_object, value) => value !== undefined)
   @IsEmail()
   @MaxLength(254)
   email?: string;
 
   @ApiPropertyOptional({ example: 'Alex Morgan', minLength: 2, maxLength: 100 })
-  @IsOptional()
+  @ValidateIf((_object, value) => value !== undefined)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @MinLength(2)
@@ -33,7 +42,7 @@ export class UpdateTrainerDto {
   hourlyRateMinor?: number | null;
 
   @ApiPropertyOptional({ example: 'AMD' })
-  @IsOptional()
+  @ValidateIf((_object, value) => value !== undefined)
   @IsString()
   @Matches(/^[A-Z]{3}$/)
   currency?: string;
