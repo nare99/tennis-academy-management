@@ -112,6 +112,23 @@ Use a unique password of at least 12 characters. The command creates the adminis
 
 The API exposes admin-only court management endpoints. The admin frontend includes authenticated admin-only court and trainer management, including trainer invitation creation and acceptance.
 
+## Trainer administration
+
+The admin application exposes trainer management at `/trainers`. An administrator can create a trainer profile, update its details and hourly rate, deactivate/reactivate an activated trainer, and reissue an expired or lost invitation.
+
+New trainer accounts are created inactive and without a password. The API creates a cryptographically random invitation token, stores only its SHA-256 hash, and returns the invitation URL to the authenticated administrator. The administrator must copy and send the link manually until an email provider is integrated. Invitations expire after seven days and are single-use. The trainer sets their own password on the public `/accept-invitation` page; successful acceptance activates the account. The trainer then signs in through the normal login page.
+
+Set `TRAINER_INVITATION_BASE_URL` in the root `.env` to the externally reachable admin frontend URL plus `/accept-invitation`. The development default is `http://localhost:5174/accept-invitation`. Production configuration requires this variable.
+
+After pulling the trainer-management branch, apply the committed database migration and regenerate Prisma Client:
+
+```bash
+npm run db:deploy
+npm run prisma:generate -w @tennis/api
+```
+
+The migration renames `TrainerProfile.hourlyRate` to `hourlyRateMinor` and adds the `TrainerInvitation` table; it does not drop existing trainer profile data.
+
 ## Useful commands
 
 | Command | Purpose |
